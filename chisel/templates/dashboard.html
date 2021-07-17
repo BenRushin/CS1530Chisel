@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -28,9 +30,34 @@
               <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">About</a>
             </div>
             <!-- Navbar Right Side -->
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
-                <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+            <div class="navbar-nav  ">
+
+
+                <div class="btn-group">
+                    <button id="dropdown-menu" type="button" class="btn btn-secondary dropdown-toggle bg-steel " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class='far fa-user-circle' style='font-size:30px'></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right ">
+                      <button class="dropdown-item" type="button">Your Profile</button>
+                      <button class="dropdown-item" type="button">Your Workout History</button>
+                      <button class="dropdown-item" type="button">Your Settings</button>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+                    </div>
+                  </div>
+
+                  <!-- unpack dropdown menu when on mobile...not the neatest code, but...-->
+                    <div id="unpack-menu">
+                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Profile</a>
+                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Workout History</a> 
+                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a>
+                        <hr>
+                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Log Out</a>  
+                    </div>                
+
+
+                <!-- <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a> -->
+                <!-- <a class="nav-item nav-link btn" href="{{ url_for('logout') }}"><i class='far fa-user-circle' style='font-size:26px'></i></a> -->
             </div>
           </div>
         </div>
