@@ -7,4 +7,4 @@ class Customer(db.Model):
     email = db.Column(db.String(120))
     
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.name
