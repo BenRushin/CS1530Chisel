@@ -38,9 +38,9 @@
                         <i class='far fa-user-circle' style='font-size:30px'></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right ">
-                      <button class="dropdown-item" type="button">Your Profile</button>
-                      <button class="dropdown-item" type="button">Your Workout History</button>
-                      <button class="dropdown-item" type="button">Your Settings</button>
+                      <a class="dropdown-item" href="{{ url_for('profile') }}">Your Profile</button>
+                      <a class="dropdown-item" href="#">Your Workout History</button>
+                      <a class="dropdown-item" href="#">Your Settings</button>
                       <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
                     </div>
@@ -48,16 +48,13 @@
 
                   <!-- unpack dropdown menu when on mobile...not the neatest code, but...-->
                     <div id="unpack-menu">
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Profile</a>
+                        <a class="nav-item nav-link" href="{{ url_for('profile') }}">Your Profile</a>
                         <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Workout History</a> 
                         <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a>
                         <hr>
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Log Out</a>  
+                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Log Out</a>  
                     </div>                
 
-
-                <!-- <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a> -->
-                <!-- <a class="nav-item nav-link btn" href="{{ url_for('logout') }}"><i class='far fa-user-circle' style='font-size:26px'></i></a> -->
             </div>
           </div>
         </div>
