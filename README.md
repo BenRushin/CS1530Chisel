@@ -12,5 +12,5 @@ to record structural changes in the database:\
 `pip install Flask-Migrate`\
 `export FLASK_APP=chisel`\
 `flask db migrate -m "message"`\
-`flask db upgrade`\
+`flask db upgrade`
 
