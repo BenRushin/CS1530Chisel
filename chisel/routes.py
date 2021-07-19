@@ -1,9 +1,9 @@
 import os, secrets
-from flask import Flask, render_template, url_for, flash, send_from_directory, session, request, redirect
+from flask import Flask, render_template, url_for, flash, send_from_directory, abort, session, request, redirect
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
-from chisel.models.Customer import Customer
-from chisel.forms import RegistrationForm, LoginForm, UpdateProfileForm
+from chisel.models.Customer import Customer, Post
+from chisel.forms import RegistrationForm, LoginForm, UpdateProfileForm, PostForm
 from PIL import Image
 
 @app.route('/')
@@ -51,9 +51,64 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route("/connect")
+def connect():
+    posts = Post.query.all() # TO-DO : query for friends only? maybe
+    return render_template('connect.html', posts=posts)
 
 
-    
+@app.route("/post/new", methods=['GET', 'POST'])
+@login_required
+def new_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('connect'))
+    return render_template('create_post.html', title='New Post',
+                           form=form, legend='New Post')
+
+
+@app.route("/post/<int:post_id>")
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=post.title, post=post)
+
+
+@app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    form = PostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.content = form.content.data
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect(url_for('post', post_id=post.id))
+    elif request.method == 'GET':
+        form.title.data = post.title
+        form.content.data = post.content
+    return render_template('create_post.html', title='Update Post',
+                           form=form, legend='Update Post')
+
+
+@app.route("/post/<int:post_id>/delete", methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash('Your post has been deleted!', 'success')
+    return redirect(url_for('connect'))
+
+
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)

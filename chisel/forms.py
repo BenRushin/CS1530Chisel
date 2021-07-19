@@ -35,6 +35,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
+class PostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    submit = SubmitField('Post')
+
 
 class UpdateProfileForm(FlaskForm):
     username = StringField('Username',
