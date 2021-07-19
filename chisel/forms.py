@@ -62,3 +62,6 @@ class UpdateProfileForm(FlaskForm):
             customer = Customer.query.filter_by(email=email.data).first()
             if customer:
                 raise ValidationError('That email is already taken.')
+
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')

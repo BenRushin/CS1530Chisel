@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for, flash, send_from_directory, a
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
 from chisel.models.Customer import Customer, Post
-from chisel.forms import RegistrationForm, LoginForm, UpdateProfileForm, PostForm
+from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
 
 @app.route('/')
@@ -119,7 +119,8 @@ def user_posts(username):
     posts = Post.query.filter_by(author=customer)\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts, user=customer)
+    form = EmptyForm()
+    return render_template('user_posts.html', posts=posts, user=customer, form=form)
 
 
 def save_picture(form_picture):
@@ -157,3 +158,43 @@ def profile():
     image_file = url_for('static', filename='images/profile_pics/'+current_user.image_file)
     return render_template('profile.html', title='Your Profile',
                            image_file=image_file, form=form)
+
+
+
+@app.route('/follow/<username>', methods=['POST'])
+@login_required
+def follow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = Customer.query.filter_by(username=username).first()
+        if user is None:
+            flash('User {} not found.'.format(username), 'warning')
+            return redirect(url_for('dashboard'))
+        if user == current_user:
+            flash('You cannot follow yourself!', 'warning')
+            return redirect(url_for('user_posts', username=username))
+        current_user.follow(user)
+        db.session.commit()
+        flash('You are following {}!'.format(username), 'success')
+        return redirect(url_for('user_posts', username=username))
+    else:
+        return redirect(url_for('dashboard'))
+
+@app.route('/unfollow/<username>', methods=['POST'])
+@login_required
+def unfollow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = Customer.query.filter_by(username=username).first()
+        if user is None:
+            flash('User {} not found.'.format(username), 'warning')
+            return redirect(url_for('index'))
+        if user == current_user:
+            flash('You cannot unfollow yourself!', 'warning')
+            return redirect(url_for('user_posts', username=username))
+        current_user.unfollow(user)
+        db.session.commit()
+        flash('You are no longer following {}!'.format(username), 'primary')
+        return redirect(url_for('user_posts', username=username))
+    else:
+        return redirect(url_for('dashboard'))

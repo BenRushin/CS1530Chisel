@@ -1,11 +1,39 @@
 {% extends "dashboard.html" %}
 {% block content %}
-    <h1 style="display: inline-block;" class="mb-3">{{ user.username }}&nbsp;</h1><h5 style="display: inline-block;">  / {{ user.email }}</h5>
+    
+
+    <h1 class="mb-2 username username-email-pairing">{{ user.username }}&nbsp;</h1>
+    <h5 class="username-email-pairing">  / {{ user.email }} </h5>
+            
+    {% if user == current_user %}
+    <a class="btn btn-info btn-sm pull-right mt-3 mb-3" href="{{ url_for('profile') }}">Edit Your Profile</a>
+    {% elif not current_user.is_following(user) %}
+      <a class="btn btn-light btn-sm pull-right mt-3">
+        <form action="{{ url_for('follow', username=user.username) }}" method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.submit(value='Follow', class='btn btn-success btn-sm pull-left') }}
+        </form>
+      </a>
+    {% else %}
+      <a class="btn btn-light btn-sm pull-right mt-3 mb-3">
+        <form action="{{ url_for('unfollow', username=user.username) }}" method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.submit(value='Unfollow', class='btn btn-primary btn-sm pull-left') }}
+        </form>
+      </a>
+    {% endif %}
+    
+    
+  
+  
+  
+    <p class="followers-following">{{ user.followers.count() }} Followers, {{ user.followed.count() }} Following</p>
     {% if user.bio %}
-    <div class="content-section">
+    <div class="content-section bio">
                 <i>"{{ user.bio }}"</i>
     </div>
     {% endif %}
+
     {% for post in posts.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/profile_pics/' + post.author.image_file) }}">
