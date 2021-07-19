@@ -1,18 +1,11 @@
 {% extends "dashboard.html" %}
 {% block content %}
-    <div class="btn-toolbar justify-content-between mt-3 mb-3" role="toolbar" aria-label="Toolbar with button groups">
-      <div class="input-group">
-        <input type="search" class="form-control rounded" placeholder="Find a user..." aria-label="Search"
-          aria-describedby="search-addon" />
-        <button type="button" class="btn btn-outline-dark">Search</button>
-      </div>
-      
-      
-      <div class="btn-group" role="group" aria-label="First group">
-        <a class="btn btn-success" href="{{ url_for('new_post') }}">Add Post</a>
-      </div>
+    <h1 style="display: inline-block;" class="mb-3">{{ user.username }}&nbsp;</h1><h5 style="display: inline-block;">  / {{ user.email }}</h5>
+    {% if user.bio %}
+    <div class="content-section">
+                <i>"{{ user.bio }}"</i>
     </div>
-
+    {% endif %}
     {% for post in posts.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/profile_pics/' + post.author.image_file) }}">
@@ -29,9 +22,9 @@
     {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
       {% if page_num %}
         {% if posts.page == page_num %}
-          <a class="btn btn-secondary mb-4" href="{{ url_for('connect', page=page_num) }}">{{ page_num }}</a>
+          <a class="btn btn-secondary mb-4" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
         {% else %}
-          <a class="btn btn-outline-secondary mb-4" href="{{ url_for('connect', page=page_num) }}">{{ page_num }}</a>
+          <a class="btn btn-outline-secondary mb-4" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
         {% endif %}
       {% else %}
         ...
