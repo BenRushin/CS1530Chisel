@@ -74,7 +74,7 @@ form .error {
 /* dumbell image will only display if screen size >= 1024px */
 @media (max-width: 1024px) {
   body {
-  background-color: #18191df5 !important; 
+  background-color: #5f788a !important; 
   }
 }
 @media (min-width: 1024px) {

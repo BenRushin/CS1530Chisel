@@ -79,6 +79,24 @@ body {
     font-size: 2.5rem;
   }
 
+  .username {
+    font-size: 3rem;
+  }
+
+  .bio {
+    margin-top: 25px;
+  }
+
+  .username-email-pairing {
+    display: inline-block;
+  }
+
+  .followers-following {
+    font-weight: 600;
+    color:rgba(95, 91, 91, 0.719);
+    font-size: large;
+  }
+
   @media (max-width: 767px) {
   #dropdown-menu {
     display: none;

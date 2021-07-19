@@ -1,12 +1,16 @@
-from flask import Flask, render_template, url_for, flash, send_from_directory, session, request, redirect
-from flask_login import login_user, logout_user, login_required
+import os, secrets
+from flask import Flask, render_template, url_for, flash, send_from_directory, abort, session, request, redirect
+from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
-from chisel.models.Customer import Customer
-from chisel.forms import RegistrationForm, LoginForm
+from chisel.models.Customer import Customer, Post
+from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
+from PIL import Image
 
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
         customer = Customer.query.filter_by(email=form.email.data).first()
@@ -22,10 +26,12 @@ def login():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        customer = Customer(username=form.username.data, email=form.email.data, password=hashed_pw)
+        customer = Customer(username=form.username.data, email=form.email.data, password=hashed_pw, bio="")
         db.session.add(customer)
         db.session.commit()
         flash(f'Welcome to Chisel, {form.username.data}!', 'success')
@@ -44,7 +50,152 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route("/account")
+
+@app.route("/connect")
+def connect():
+    page = request.args.get('page', 1, type=int)
+    # eventually we want to query only followers posts using this:
+    #posts = Customer.followed_posts(current_user).paginate(page=page, per_page=5)
+    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
+    return render_template('connect.html', posts=posts)
+
+
+@app.route("/post/new", methods=['GET', 'POST'])
 @login_required
-def account():
-    return render_template('dashboard.html', title='Account')
+def new_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('connect'))
+    return render_template('create_post.html', title='New Post',
+                           form=form, legend='New Post')
+
+
+@app.route("/post/<int:post_id>")
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=post.title, post=post)
+
+
+@app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    form = PostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.content = form.content.data
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect(url_for('post', post_id=post.id))
+    elif request.method == 'GET':
+        form.title.data = post.title
+        form.content.data = post.content
+    return render_template('create_post.html', title='Update Post',
+                           form=form, legend='Update Post')
+
+
+@app.route("/post/<int:post_id>/delete", methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash('Your post has been deleted!', 'success')
+    return redirect(url_for('connect'))
+
+
+
+@app.route("/user/<string:username>")
+def user_posts(username):
+    page = request.args.get('page', 1, type=int)
+    customer = Customer.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=customer)\
+        .order_by(Post.date_posted.desc())\
+        .paginate(page=page, per_page=5)
+    form = EmptyForm()
+    return render_template('user_posts.html', posts=posts, user=customer, form=form)
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture = random_hex + f_ext
+    pic_path = os.path.join(app.root_path, 'static/images/profile_pics/', picture)
+
+    output_size = (161, 161) 
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(pic_path)
+
+    return picture
+
+
+@app.route("/profile", methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.bio = form.bio.data
+        db.session.commit()
+        flash('Your profile has been updated!', 'success')
+        return redirect(url_for('profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.bio.data = current_user.bio
+    image_file = url_for('static', filename='images/profile_pics/'+current_user.image_file)
+    return render_template('profile.html', title='Your Profile',
+                           image_file=image_file, form=form)
+
+
+
+@app.route('/follow/<username>', methods=['POST'])
+@login_required
+def follow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = Customer.query.filter_by(username=username).first()
+        if user is None:
+            flash('User {} not found.'.format(username), 'warning')
+            return redirect(url_for('dashboard'))
+        if user == current_user:
+            flash('You cannot follow yourself!', 'warning')
+            return redirect(url_for('user_posts', username=username))
+        current_user.follow(user)
+        db.session.commit()
+        flash('You are following {}!'.format(username), 'success')
+        return redirect(url_for('user_posts', username=username))
+    else:
+        return redirect(url_for('dashboard'))
+
+@app.route('/unfollow/<username>', methods=['POST'])
+@login_required
+def unfollow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = Customer.query.filter_by(username=username).first()
+        if user is None:
+            flash('User {} not found.'.format(username), 'warning')
+            return redirect(url_for('index'))
+        if user == current_user:
+            flash('You cannot unfollow yourself!', 'warning')
+            return redirect(url_for('user_posts', username=username))
+        current_user.unfollow(user)
+        db.session.commit()
+        flash('You are no longer following {}!'.format(username), 'primary')
+        return redirect(url_for('user_posts', username=username))
+    else:
+        return redirect(url_for('dashboard'))

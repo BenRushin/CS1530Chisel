@@ -1,0 +1,61 @@
+{% extends "dashboard.html" %}
+{% block content %}
+    
+
+    <h1 class="mb-2 username username-email-pairing">{{ user.username }}&nbsp;</h1>
+    <h5 class="username-email-pairing">  / {{ user.email }} </h5>
+            
+    {% if user == current_user %}
+    <a class="btn btn-info btn-sm pull-right mt-3 mb-3" href="{{ url_for('profile') }}">Edit Your Profile</a>
+    {% elif not current_user.is_following(user) %}
+      <a class="btn btn-light btn-sm pull-right mt-3">
+        <form action="{{ url_for('follow', username=user.username) }}" method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.submit(value='Follow', class='btn btn-success btn-sm pull-left') }}
+        </form>
+      </a>
+    {% else %}
+      <a class="btn btn-light btn-sm pull-right mt-3 mb-3">
+        <form action="{{ url_for('unfollow', username=user.username) }}" method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.submit(value='Unfollow', class='btn btn-primary btn-sm pull-left') }}
+        </form>
+      </a>
+    {% endif %}
+    
+    
+  
+  
+  
+    <p class="followers-following">{{ user.followers.count() }} Followers, {{ user.followed.count() }} Following</p>
+    {% if user.bio %}
+    <div class="content-section bio">
+                <i>"{{ user.bio }}"</i>
+    </div>
+    {% endif %}
+
+    {% for post in posts.items %}
+        <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/profile_pics/' + post.author.image_file) }}">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="{{ url_for('user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
+              <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+            </div>
+            <h2><a class="article-title" href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
+            <p class="article-content">{{ post.content }}</p>
+          </div>
+        </article>
+    {% endfor %}
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if posts.page == page_num %}
+          <a class="btn btn-secondary mb-4" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-secondary mb-4" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+    {% endfor %}
+{% endblock content %}

@@ -20,14 +20,14 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/dashboard">Chisel</a>
+          <a class="navbar-brand mr-4" href="#">Chisel</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Home</a>
-              <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">About</a>
+              <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Create</a>
+              <a class="nav-item nav-link" href="{{ url_for('connect') }}">Connect</a>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav  ">
@@ -38,9 +38,9 @@
                         <i class='far fa-user-circle' style='font-size:30px'></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right ">
-                      <button class="dropdown-item" type="button">Your Profile</button>
-                      <button class="dropdown-item" type="button">Your Workout History</button>
-                      <button class="dropdown-item" type="button">Your Settings</button>
+                      <a class="dropdown-item" href="{{ url_for('profile') }}">Your Profile</button>
+                      <a class="dropdown-item" href="#">Your Workout History</button>
+                      <a class="dropdown-item" href="#">Your Settings</button>
                       <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
                     </div>
@@ -48,16 +48,13 @@
 
                   <!-- unpack dropdown menu when on mobile...not the neatest code, but...-->
                     <div id="unpack-menu">
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Profile</a>
+                        <a class="nav-item nav-link" href="{{ url_for('profile') }}">Your Profile</a>
                         <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Workout History</a> 
                         <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a>
                         <hr>
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Log Out</a>  
+                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Log Out</a>  
                     </div>                
 
-
-                <!-- <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a> -->
-                <!-- <a class="nav-item nav-link btn" href="{{ url_for('logout') }}"><i class='far fa-user-circle' style='font-size:26px'></i></a> -->
             </div>
           </div>
         </div>
@@ -81,7 +78,7 @@
         </div>
         <div class="col-md-4">
           <div class="content-section">
-            <h3>Our Sidebar</h3>
+            <h3>Today's Workout</h3>
             <p class='text-muted'>[Insert Calander, Updates, Etc].
               <ul class="list-group">
                 <li class="list-group-item list-group-item-light">Announcements</li>
