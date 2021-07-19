@@ -54,7 +54,8 @@ def logout():
 @app.route("/connect")
 def connect():
     page = request.args.get('page', 1, type=int)
-    # eventually we might just want to query only friends posts
+    # eventually we want to query only followers posts using this:
+    #posts = Customer.followed_posts(current_user).paginate(page=page, per_page=5)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('connect.html', posts=posts)
 

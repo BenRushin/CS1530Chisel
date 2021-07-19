@@ -41,7 +41,7 @@ class Customer(db.Model, UserMixin):
             followers, (followers.c.followed_id == Post.user_id)).filter(
                 followers.c.follower_id == self.id)
         own = Post.query.filter_by(user_id=self.id)
-        return followed.union(own).order_by(Post.timestamp.desc())
+        return followed.union(own).order_by(Post.date_posted.desc())
 
     def __repr__(self):
         return '<User %r>' % self.username
