@@ -50,6 +50,12 @@ body {
     width: 65px;
     margin-right: 16px;
   }
+
+  .profile-img {
+    height: 130px;
+    width: 130px;
+    margin-right: 16px;
+  }
   
   .article-metadata {
     padding-bottom: 1px;

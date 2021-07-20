@@ -23,6 +23,7 @@
             
             <div class="media-body">
               <div class="article-metadata">
+                <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/profile_pics/' + customer.image_file) }}">
                 <large class="search-username">{{customer.username  }}</large>
                 <small class="text-muted">/ {{customer.email }}</small>
                 <a class="mr-2 btn btn-info btn-sm pull-right" href="{{ url_for('user_posts', username=customer.username) }}">View Profile</a>

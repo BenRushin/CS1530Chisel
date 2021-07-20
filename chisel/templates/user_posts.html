@@ -2,6 +2,7 @@
 {% block content %}
     
 
+    <img class="rounded-circle profile-img" src="{{ url_for('static', filename='images/profile_pics/' + user.image_file) }}">
     <h1 class="mb-2 username username-email-pairing">{{ user.username }}&nbsp;</h1>
     <h5 class="username-email-pairing">  / {{ user.email }} </h5>
             
@@ -27,13 +28,17 @@
   
   
   
-    <p class="followers-following">{{ user.followers.count() }} Followers, {{ user.followed.count() }} Following</p>
+    <p class="followers-following mt-3">{{ user.followers.count() }} Followers, {{ user.followed.count() }} Following</p>
     {% if user.bio %}
     <div class="content-section bio">
                 <i>"{{ user.bio }}"</i>
     </div>
     {% endif %}
 
+
+    {% if not posts.items %}
+    <p class='content-section'>This user has not posted any content yet!</p> 
+    {% endif %}
     {% for post in posts.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/profile_pics/' + post.author.image_file) }}">
