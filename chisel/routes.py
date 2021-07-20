@@ -15,6 +15,7 @@ def login():
     if form.validate_on_submit():
         customer = Customer.query.filter_by(email=form.email.data).first()
         if customer and bcrypt.check_password_hash(customer.password, form.password.data):
+            session['customer_username'] = customer.username
             login_user(customer, remember=form.remember.data)
             flash('Successful login!', 'success')
             next_page = request.args.get('next')
@@ -64,9 +65,9 @@ def connect():
     q = request.args.get('q')
     if q:
         customers = Customer.query.filter(Customer.username.startswith(q) | Customer.email.startswith(q)).limit(10).all()
-        return render_template('connect.html', customers=customers)
+        return render_template('connect.html', customers=customers, username=session['customer_username'])
     
-    return render_template('connect.html', posts=posts)
+    return render_template('connect.html', posts=posts, username=session['customer_username'])
 
 
 
