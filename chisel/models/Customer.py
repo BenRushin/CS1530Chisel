@@ -40,8 +40,11 @@ class Customer(db.Model, UserMixin):
         followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)).filter(
                 followers.c.follower_id == self.id)
+
+        # we include ALL own posts and admin (user_id=1) posts!
         own = Post.query.filter_by(user_id=self.id)
-        return followed.union(own).order_by(Post.date_posted.desc())
+        admin = Post.query.filter_by(user_id=1) 
+        return followed.union(own).union(admin).order_by(Post.date_posted.desc())
 
     def __repr__(self):
         return '<User %r>' % self.username

@@ -15,6 +15,7 @@ def login():
     if form.validate_on_submit():
         customer = Customer.query.filter_by(email=form.email.data).first()
         if customer and bcrypt.check_password_hash(customer.password, form.password.data):
+            session['customer_username'] = customer.username
             login_user(customer, remember=form.remember.data)
             flash('Successful login!', 'success')
             next_page = request.args.get('next')
@@ -52,12 +53,23 @@ def logout():
 
 
 @app.route("/connect")
+@login_required
 def connect():
     page = request.args.get('page', 1, type=int)
-    # eventually we want to query only followers posts using this:
-    #posts = Customer.followed_posts(current_user).paginate(page=page, per_page=5)
-    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('connect.html', posts=posts)
+    # we want to query only followers posts using this:
+    posts = Customer.followed_posts(current_user).paginate(page=page, per_page=5)
+    # if we want to query ALL posts, we can use:
+    #posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=2)
+    
+    # and here is the search function
+    q = request.args.get('q')
+    if q:
+        customers = Customer.query.filter(Customer.username.startswith(q) | Customer.email.startswith(q)).limit(10).all()
+        return render_template('connect.html', customers=customers, username=session['customer_username'])
+    
+    return render_template('connect.html', posts=posts, username=session['customer_username'])
+
+
 
 
 @app.route("/post/new", methods=['GET', 'POST'])
@@ -189,7 +201,7 @@ def unfollow(username):
         user = Customer.query.filter_by(username=username).first()
         if user is None:
             flash('User {} not found.'.format(username), 'warning')
-            return redirect(url_for('index'))
+            return redirect(url_for('dashboard'))
         if user == current_user:
             flash('You cannot unfollow yourself!', 'warning')
             return redirect(url_for('user_posts', username=username))

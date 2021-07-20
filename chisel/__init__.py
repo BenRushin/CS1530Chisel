@@ -6,7 +6,7 @@ from flask_migrate import Migrate
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '63568fa89c93404194403738d884f5c0' # randomly generated
+app.config['SECRET_KEY'] = b'\x93\xb7d\xf4\x8do\xc4\x14~\xffw\xc1\xdd\xdc\xb6\xedt_\xe9\x96M:\x0cVa\x03\x0c5\xc0 j\xaa' # randomly generated
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chisel.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
