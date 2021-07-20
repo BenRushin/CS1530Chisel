@@ -1,14 +1,11 @@
-{% extends "dashboard.html" %}
+{% extends "base.html" %}
 {% block content %}
-    <div class="btn-toolbar justify-content-between mt-3 mb-3" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups" id="connect-toolbar">
       <div class="input-group">
-        <form class="form-inline" method="GET">
-          <input  type="search" name="q" class="form-control rounded btn-sm" placeholder="Search for a user or email..." aria-label="Search"
-          aria-describedby="search-addon">
-          <button type="submit" class="btn btn-outline-dark btn-sm">Search</button>
-        </form>
+        <input  type="search" name="q" class="form-control rounded btn-sm" placeholder="Search for a user or email..." aria-label="Search"
+        aria-describedby="search-addon">
+        <button type="submit" class="btn btn-outline-dark btn-sm">Search</button>
       </div>
-      
       
       <div class="btn-group" role="group" aria-label="First group">
         <a class="btn btn-success btn-sm" href="{{ url_for('new_post') }}">Add Post</a>
@@ -61,3 +58,35 @@
       {% endfor %}
     {% endif %}
 {% endblock content %}
+
+{% block sidebar %}
+<div class="content-section">
+  <div style="text-align: center">
+    <h3>Hello, {{username}}!</h3>
+    <h6>X posts</h6>
+  </div>
+  <hr>
+  <div class="list-group">
+    <a href="#" class="list-group-item list-group-item-action active connect-option">
+        All Activity
+        <i class="fa fa-users"></i>
+    </a>
+    <a href="#" class="list-group-item list-group-item-action connect-option">
+      Your Posts
+      <i class="fa fa-pencil-square-o"></i>
+    </a>
+    <a href="#" class="list-group-item list-group-item-action connect-option">
+      Your Comments
+      <i class="fa fa-commenting-o"></i>
+    </a>
+    <a href="#" class="list-group-item list-group-item-action connect-option">
+      Settings
+      <i class="fa fa-sliders"></i>
+    </a>
+    <a href="#" class="list-group-item list-group-item-action disabled connect-option" tabindex="-1" aria-disabled="true">
+      Report
+      <i class="fa fa-flag"></i>
+    </a>
+  </div>
+</div>
+{% endblock %}
