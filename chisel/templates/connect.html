@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups" id="connect-toolbar">
-      <div class="input-group">
-        <input  type="search" name="q" class="form-control rounded btn-sm" placeholder="Search for a user or email..." aria-label="Search"
-        aria-describedby="search-addon">
-        <button type="submit" class="btn btn-outline-dark btn-sm">Search</button>
-      </div>
+      <form>
+        <div class="input-group">
+          <input type="search" name="q" class="form-control rounded btn-sm" placeholder="Search for a user or email..." aria-label="Search"
+          aria-describedby="search-addon">
+          <button type="submit" class="btn btn-outline-dark btn-sm">Search</button>
+        </div>
+      </form>
       
       <div class="btn-group" role="group" aria-label="First group">
         <a class="btn btn-success btn-sm" href="{{ url_for('new_post') }}">Add Post</a>
