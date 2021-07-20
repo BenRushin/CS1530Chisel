@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -18,49 +18,56 @@
 </head>
 <body>
     <header class="site-header">
-      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-        <div class="container">
-          <a class="navbar-brand mr-4" href="#">Chisel</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Chisel</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse" id="navbarToggle">
-            <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Create</a>
-              <a class="nav-item nav-link" href="{{ url_for('connect') }}">Connect</a>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">Create</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('connect') }}">Connect</a>
+              </li>
+            </ul>
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle bg-steel" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class='fa fa-user-circle' style='font-size:30px'></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('profile') }}">Your Profile</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('dashboard') }}">Your Workout History</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('dashboard') }}">Your Settings</a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+                  </li>
+                </ul>
             </div>
-            <!-- Navbar Right Side -->
-            <div class="navbar-nav  ">
 
-
-                <div class="btn-group">
-                    <button id="dropdown-menu" type="button" class="btn btn-secondary dropdown-toggle bg-steel " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class='far fa-user-circle' style='font-size:30px'></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right ">
-                      <a class="dropdown-item" href="{{ url_for('profile') }}">Your Profile</button>
-                      <a class="dropdown-item" href="#">Your Workout History</button>
-                      <a class="dropdown-item" href="#">Your Settings</button>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
-                    </div>
-                  </div>
-
-                  <!-- unpack dropdown menu when on mobile...not the neatest code, but...-->
-                    <div id="unpack-menu">
-                        <a class="nav-item nav-link" href="{{ url_for('profile') }}">Your Profile</a>
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Workout History</a> 
-                        <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a>
-                        <hr>
-                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Log Out</a>  
-                    </div>                
-
-            </div>
+              <!-- unpack dropdown menu when on mobile...not the neatest code, but...-->
+            <div id="unpack-menu">
+                <a class="nav-item nav-link" href="{{ url_for('profile') }}">Your Profile</a>
+                <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Workout History</a> 
+                <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a>
+                <hr>
+                <a class="nav-item nav-link" href="{{ url_for('logout') }}">Log Out</a>  
+            </div>                
+          </div>
           </div>
         </div>
       </nav>
     </header>
-    <main role="main" class="container">
+    <main role="main" class="container" id="main-content">
       <div class="row">
         <div class="col-md-8">
           {% with messages = get_flashed_messages(with_categories=true) %}
@@ -79,7 +86,7 @@
         <div class="col-md-4">
           <div class="content-section">
             <h3>Today's Workout</h3>
-            <p class='text-muted'>[Insert Calander, Updates, Etc].
+            <p class='text-muted'>[Insert calendar, updates, etc].
               <ul class="list-group">
                 <li class="list-group-item list-group-item-light">Announcements</li>
                 <li class="list-group-item list-group-item-light">Notifications</li>
@@ -94,6 +101,6 @@
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>
