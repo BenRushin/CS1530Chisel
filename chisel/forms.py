@@ -63,5 +63,6 @@ class UpdateProfileForm(FlaskForm):
             if customer:
                 raise ValidationError('That email is already taken.')
 
+# used for follow/unfollow 
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
