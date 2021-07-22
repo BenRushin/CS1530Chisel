@@ -14,7 +14,7 @@ to record structural changes in the database:\
 `flask db migrate -m "message"`\
 `flask db upgrade`
 
-testing from root:\
+testing from root (make sure app is running before testing):\
 `pip intall pytest`\
 `pytest ./testing/`\
 happy path test should succeed
