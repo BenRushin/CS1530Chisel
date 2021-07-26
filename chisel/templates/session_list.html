@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>
+  <div class="d-flex justify-content-between">
+    <div>
+      Session List
+    </div>
+    <div>
+      <i class="fa fa-list-alt" aria-hidden="true"></i>
+    </div>
+  </div>
+</h2>
+<hr>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
+      <th scope="col">Date</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ses in ses_list %}
+    <tr>
+      <td>{{ ses.name }}</td>
+      <td>{{ ses.desc }}</td>
+      <td>{{ ses.date.strftime("%m/%d/%Y") }}</td>
+      <td><a href="#" class="btn btn-sm btn-success">Open</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+{% block sidebar %}
+<div class="content-section">
+  <div class="list-group">
+    <a href="{{ url_for( 'create_session' ) }}" class="list-group-item list-group-item-action connect-option">
+      Create a New Session
+      <i class="fa fa-plus-circle"></i>
+    </a>
+    <a href="{{ url_for( 'dashboard' ) }}" class="list-group-item list-group-item-action connect-option">
+      Back to Dashboard
+      <i class="fa fa-home" aria-hidden="true"></i>
+    </a>
+    <!-- <a href="#" class="list-group-item list-group-item-action disabled connect-option" tabindex="-1" aria-disabled="true">
+      Report
+      <i class="fa fa-flag"></i>
+    </a> -->
+  </div>
+  <br/>
+  <div class="list-group">
+    <a href="#" class="list-group-item list-group-item-action connect-option">
+      Log Out
+      <i class="fa fa-sign-out"></i>
+    </a>
+  </div>
+</div>
+{% endblock %}

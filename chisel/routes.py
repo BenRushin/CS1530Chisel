@@ -2,9 +2,10 @@ import os, secrets
 from flask import Flask, render_template, url_for, flash, send_from_directory, abort, session, request, redirect
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
-from chisel.models.Customer import Customer, Post
+from chisel.models.Customer import Customer, Post, WorkoutSession
 from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
+from datetime import date, datetime
 
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
@@ -15,7 +16,6 @@ def login():
     if form.validate_on_submit():
         customer = Customer.query.filter_by(email=form.email.data).first()
         if customer and bcrypt.check_password_hash(customer.password, form.password.data):
-            session['customer_username'] = customer.username
             login_user(customer, remember=form.remember.data)
             flash('Successful login!', 'success')
             next_page = request.args.get('next')
@@ -43,13 +43,35 @@ def register():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html', username=session['customer_username'])
+    return render_template('dashboard.html', username=current_user.username)
 
     
 @app.route('/create-session', methods=['GET', 'POST'])
 @login_required
 def create_session():
-    return render_template('create_session.html', username=session['customer_username'])
+    if request.method == 'POST':
+        current_customer = Customer.query.filter_by( username = current_user.username ).first()
+        new_session = WorkoutSession( name = request.form[ "sesname" ], desc = request.form[ "sesdesc" ], 
+                                      date = datetime.strptime( request.form[ "sesdate" ], '%Y-%m-%d' ), type = int( request.form[ "sestype" ] ), user_id = current_customer.id )
+        db.session.add( new_session )
+        db.session.commit()
+        success_str = "Successfully created a new session!"
+        if request.form.get( "sesredir" ):
+            success_str += "\nRedirected to session list."
+            flash( success_str )
+            return redirect( url_for( 'session_list' ) )
+        else:
+            flash( success_str )
+
+    return render_template('create_session.html', username=current_user.username)
+
+
+@app.route('/session-list', methods=['GET', 'POST'])
+@login_required
+def session_list():
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    print( current_customer.sessions )
+    return render_template('session_list.html', username=current_user.username, ses_list = current_customer.sessions )
 
 
 @app.route("/logout")
@@ -67,13 +89,16 @@ def connect():
     # if we want to query ALL posts, we can use:
     #posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=2)
     
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    customer_post_count = Post.query.filter_by( user_id = current_customer.id ).count()
+
     # and here is the search function
     q = request.args.get('q')
     if q:
         customers = Customer.query.filter(Customer.username.startswith(q) | Customer.email.startswith(q)).limit(10).all()
-        return render_template('connect.html', customers=customers, username=session['customer_username'])
+        return render_template('connect.html', customers=customers, username=current_user.username)
     
-    return render_template('connect.html', posts=posts, username=session['customer_username'])
+    return render_template('connect.html', posts=posts, username=current_user.username, post_count = customer_post_count)
 
 
 

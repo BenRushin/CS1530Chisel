@@ -11,43 +11,48 @@
   </div>
 </h2>
 <hr>
-<form>
+<form action="{{ url_for( 'create_session' ) }}" method="POST">
   <div class="mb-3">
     <label for="sesname" class="form-label">Session name</label>
-    <input type="text" class="form-control" id="sesname" required>
+    <input type="text" class="form-control" name="sesname" required>
   </div>
   <div class="mb-3">
     <label for="sesdesc" class="form-label">Description (optional)</label>
-    <input type="text" class="form-control" id="sesdesc">
+    <input type="text" class="form-control" name="sesdesc">
+  </div>
+  <div class="mb-3">
+    <label for="sesdate" class="form-label">Date</label>
+    <input type="date" class="form-control" name="sesdate">
+    <small>Chisel will remind you when this session is up next on your schedule.</small>
   </div>
   <div class="mb-3">
     <label for="sestype" class="form-label">Session type</label>
-    <select id="sestype" class="form-select">
-      <option>Cardio-only</option>
-      <option>Upper-body focus</option>
-      <option>Lower-body focus</option>
-      <option>Abdominal/core strength</option>
-      <option>Variety</option>
+    <select name="sestype" class="form-select">
+      <option value="1">Cardio-only</option>
+      <option value="2">Upper-body focus*</option>
+      <option value="3">Lower-body focus*</option>
+      <option value="4">Abdominal/core strength</option>
+      <option value="5">Variety*</option>
     </select>
-    <small>Chisel will use this to determine what starter set to present to you.</small>
+    <small>Chisel will use this to determine what starter set to present to you.<br/><i>* Types may require exercise equipment (weights, machines, etc.).</i></small>
   </div>
   <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="sesredir">
+    <input type="checkbox" class="form-check-input" name="sesredir">
     <label class="form-check-label" for="sesredir">Redirect after creating this session</label>
   </div>
-  <button type="submit" class="btn btn-success">Add</button>
+  <button type="submit" class="btn btn-success">Create</button>
 </form>
 {% endblock %}
 {% block sidebar %}
 <div class="content-section">
   <div class="list-group">
-    <a href="#" class="list-group-item list-group-item-action connect-option">
+    <a href="{{ url_for( 'session_list' ) }}" class="list-group-item list-group-item-action connect-option">
       Session List
       <i class="fa fa-list-alt"></i>
     </a>
     <a href="{{ url_for( 'dashboard' ) }}" class="list-group-item list-group-item-action connect-option">
       Back to Dashboard
-      <i class="fa fa-commenting-o"></i>
+      <i class="fa fa-home" aria-hidden="true"></i>
     </a>
     <!-- <a href="#" class="list-group-item list-group-item-action disabled connect-option" tabindex="-1" aria-disabled="true">
       Report

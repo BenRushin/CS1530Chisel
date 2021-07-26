@@ -5,8 +5,11 @@
 <div class="d-flex justify-content-center">
   <div class="btn-group btn-group-lg" role="group" aria-label="Dashboard selection">
     <a href="{{ url_for( 'create_session' ) }}" class="btn btn-secondary bg-steel">
-      <i class="fa fa-plus-circle"></i><br/>Create a New Session</a>
-    <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-list-alt"></i><br/>Session List</button>
+      <i class="fa fa-plus-circle"></i><br/>Create a New Session
+    </a>
+    <a href="{{ url_for( 'session_list' ) }}" class="btn btn-secondary bg-steel">
+      <i class="fa fa-list-alt"></i><br/>Session List
+    </a>
     <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-history"></i><br/>Workout History</button>
     <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-bar-chart" aria-hidden="true"></i><br/>Statistics</button>
   </div>

@@ -65,7 +65,7 @@
 <div class="content-section">
   <div style="text-align: center">
     <h3>{{username}}</h3>
-    <h6>X posts</h6>
+    <h6>{% if post_count > 0 %}{{ post_count }}{% else %}No{% endif %} posts</h6>
   </div>
   <hr>
   <div class="list-group">
