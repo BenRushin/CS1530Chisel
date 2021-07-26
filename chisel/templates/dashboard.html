@@ -1,18 +1,45 @@
 <!-- all customer pages will extend this file -->
 {% extends "base.html" %}
-
 <!-- all customer pages content will be inserted here (or where neccessary)-->
-{% block content %}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center">
+  <div class="btn-group btn-group-lg" role="group" aria-label="Dashboard selection">
+    <a href="{{ url_for( 'create_session' ) }}" class="btn btn-secondary bg-steel">
+      <i class="fa fa-plus-circle"></i><br/>Create a New Session</a>
+    <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-list-alt"></i><br/>Session List</button>
+    <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-history"></i><br/>Workout History</button>
+    <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-bar-chart" aria-hidden="true"></i><br/>Statistics</button>
+  </div>
+</div>
+<br/>
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h5>Next scheduled session</h5>
+        Your next session, session name, is scheduled for X.
+      </div>
+      <div>
+        <a href="#" class="btn btn-secondary bg-steel"><i class="fa fa-play fa-3x" aria-hidden="true"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+<br/>
+{% endblock %}
 {% block sidebar %}
 <div class="content-section">
-  <h3>Today's Workout</h3>
-  <p class='text-muted'>[Insert calendar, updates, etc].
-    <ul class="list-group">
-      <li class="list-group-item list-group-item-light">Announcements</li>
-      <li class="list-group-item list-group-item-light">Notifications</li>
-      <li class="list-group-item list-group-item-light">Calendars</li>
-      <li class="list-group-item list-group-item-light">etc</li>
-    </ul>
-  </p>
+  <h3 class="d-flex justify-content-center">Hey there, {{username}}!</h3>
+  <hr>
+  <div class="list-group">
+    <a href="#" class="list-group-item list-group-item-action connect-option">
+      Account Settings
+      <i class="fa fa-sliders"></i>
+    </a>
+    <a href="#" class="list-group-item list-group-item-action connect-option">
+      Log Out
+      <i class="fa fa-sign-out"></i>
+    </a>
+  </div>
 </div>
 {% endblock %}

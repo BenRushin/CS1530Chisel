@@ -43,7 +43,13 @@ def register():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', username=session['customer_username'])
+
+    
+@app.route('/create-session', methods=['GET', 'POST'])
+@login_required
+def create_session():
+    return render_template('create_session.html', username=session['customer_username'])
 
 
 @app.route("/logout")
