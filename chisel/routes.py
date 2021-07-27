@@ -96,7 +96,7 @@ def create_session():
         
         random.shuffle( possible_exercises )
         print( possible_exercises )
-        for i in range(0, 3):
+        for i in range(3):
             this_exercise = possible_exercises[ i ]
             print( this_exercise )
             new_exercise = Exercise( name = this_exercise[ 0 ], 
