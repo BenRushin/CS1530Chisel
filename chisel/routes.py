@@ -44,7 +44,7 @@ def register():
 @login_required
 def dashboard():
     current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.today(), WorkoutSession.user_id == current_customer.id )
+    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.today(), WorkoutSession.user_id == current_customer.id ).order_by( WorkoutSession.date )
 
     if not upcoming_sessions:
         return render_template('dashboard.html', username=current_user.username )
