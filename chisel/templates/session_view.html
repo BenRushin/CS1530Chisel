@@ -26,14 +26,14 @@
     </tr>
   </thead>
   <tbody>
-    <!-- {% for ex in ses_list %}
+    {% for ex in ex_list %}
     <tr>
-      <td>{{ ses.name }}</td>
-      <td>{{ ses.desc }}</td>
-      <td>{{ ses.date.strftime("%m/%d/%Y") }}</td>
-      <td><a href="#" class="btn btn-sm btn-success">Open</a>&nbsp;<a href="{{ url_for( 'delete_session', session_id = ses.id ) }}" class="btn btn-sm btn-danger">Delete</a></td>
+      <td>{{ ex.name }}</td>
+      <td>{{ ex.reps }}</td>
+      <td>{{ ex.sets }}</td>
+      <td><a href="#" class="btn btn-sm btn-success">Done</a></td>
     </tr>
-    {% endfor %} -->
+    {% endfor %}
   </tbody>
 </table>
 {% endblock %}

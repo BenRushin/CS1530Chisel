@@ -1,8 +1,8 @@
-import os, secrets
+import os, secrets, random
 from flask import Flask, render_template, url_for, flash, send_from_directory, abort, session, request, redirect
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
-from chisel.models.Customer import Customer, Post, WorkoutSession
+from chisel.models.Customer import Customer, Post, Exercise, WorkoutSession
 from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
 from datetime import date, datetime
@@ -50,15 +50,60 @@ def dashboard():
         return render_template('dashboard.html', username=current_user.username )
         
     return render_template('dashboard.html', username=current_user.username, next_ses = upcoming_sessions.first() )
-    
+
+# Workout name, rep count, set count
+workout_examples = {
+    1: [
+        ("Jog in Place (1 rep = 1 sec.)", 60, 3),
+        ("Fast Walk or Brisk Jog (1 rep = 1 mi.)", 1, 1),
+        ("Jumping Jacks", 30, 3),
+        ("Stair Climbing", 10, 1),
+        ("Mountain Climbers", 40, 2)
+    ],
+    2: [
+        ("Push-ups", 15, 3),
+        ("Lateral Pulldown", 10, 3),
+        ("Bicep Curls", 10, 3),
+        ("Bench Press", 10, 3),
+        ("Bent-over Row", 8, 3)
+    ],
+    3: [
+        ("Deadlift", 10, 3),
+        ("Squats", 10, 3),
+        ("Squats", 10, 3),
+    ],
+    4: [
+        ("Sit-ups", 25, 3),
+        ("Plank (1 rep = 1 sec.)", 30, 3),
+        ("Side Plank (1 rep = 1 sec.)", 30, 3),
+    ]
+}
+
 @app.route('/create-session', methods=['GET', 'POST'])
 @login_required
 def create_session():
     if request.method == 'POST':
         current_customer = Customer.query.filter_by( username = current_user.username ).first()
+        ses_type = int( request.form[ "sestype" ] )
         new_session = WorkoutSession( name = request.form[ "sesname" ], desc = request.form[ "sesdesc" ], 
-                                      date = datetime.strptime( request.form[ "sesdate" ], '%Y-%m-%d' ), type = int( request.form[ "sestype" ] ), user_id = current_customer.id )
+                                      date = datetime.strptime( request.form[ "sesdate" ], '%Y-%m-%d' ), type = ses_type, user_id = current_customer.id )
+
         db.session.add( new_session )
+        db.session.commit()
+
+        print( new_session.id )
+        possible_exercises = workout_examples[ ses_type ]
+        
+        random.shuffle( possible_exercises )
+        print( possible_exercises )
+        for i in range(0, 3):
+            this_exercise = possible_exercises[ i ]
+            print( this_exercise )
+            new_exercise = Exercise( name = this_exercise[ 0 ], 
+                            reps = str( this_exercise[ 1 ] ),
+                            sets = this_exercise[ 2 ], session_id = new_session.id )
+            db.session.add( new_exercise )
+
         db.session.commit()
         success_str = "Successfully created a new session!"
         if request.form.get( "sesredir" ):
@@ -87,6 +132,7 @@ def delete_session( session_id = None ):
 
     deleted_session_name = WorkoutSession.query.filter_by( id = session_id ).one().name
     WorkoutSession.query.filter_by( id = session_id ).delete()
+    Exercise.query.filter( Exercise.session_id == session_id ).delete()
     db.session.commit()
 
     
@@ -109,7 +155,10 @@ def view_session( session_id = None ):
         return redirect( url_for( 'session_list' ) )
 
     this_session = WorkoutSession.query.filter_by( id = session_id ).one()
-    return render_template( 'session_view.html', ses = this_session, session_type = session_types[ this_session.type ] )
+    exercises = this_session.exercises
+    print( exercises )
+    
+    return render_template( 'session_view.html', ses = this_session, session_type = session_types[ this_session.type ], ex_list = exercises )
 
 @app.route("/logout")
 def logout():
