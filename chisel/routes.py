@@ -6,6 +6,7 @@ from chisel.models.Customer import Customer, Post, Exercise, WorkoutSession
 from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
 from datetime import date, datetime
+from sqlalchemy import asc
 
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
@@ -44,7 +45,7 @@ def register():
 @login_required
 def dashboard():
     current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.today(), WorkoutSession.user_id == current_customer.id ).order_by( WorkoutSession.date )
+    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.now().date(), WorkoutSession.user_id == current_customer.id ).order_by( asc( WorkoutSession.date ) )
 
     if not upcoming_sessions:
         return render_template('dashboard.html', username=current_user.username )
