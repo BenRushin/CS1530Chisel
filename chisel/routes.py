@@ -117,7 +117,7 @@ def connect():
     q = request.args.get('q')
     if q:
         customers = Customer.query.filter(Customer.username.startswith(q) | Customer.email.startswith(q)).limit(10).all()
-        return render_template('connect.html', customers=customers, username=current_user.username)
+        return render_template('connect.html', customers=customers, username=current_user.username, post_count = customer_post_count)
     
     return render_template('connect.html', posts=posts, username=current_user.username, post_count = customer_post_count)
 
