@@ -5,12 +5,12 @@
 <div class="d-flex justify-content-center">
   <div class="btn-group btn-group-lg" role="group" aria-label="Dashboard selection">
     <a href="{{ url_for( 'create_session' ) }}" class="btn btn-secondary bg-steel">
-      <i class="fa fa-plus-circle"></i><br/>Create a New Session
+      <i class="fa fa-plus-circle"></i><br/>New Session
     </a>
     <a href="{{ url_for( 'session_list' ) }}" class="btn btn-secondary bg-steel">
       <i class="fa fa-list-alt"></i><br/>Session List
     </a>
-    <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-history"></i><br/>Workout History</button>
+    <a href="#" class="btn btn-secondary bg-steel"><i class="fa fa-history"></i><br/>Workout History</a>
     <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-bar-chart" aria-hidden="true"></i><br/>Statistics</button>
   </div>
 </div>
@@ -24,7 +24,7 @@
         Your next session, {{ next_ses.name }}, is scheduled for {{ next_ses.date.strftime("%m/%d/%Y") }}.
       </div>
       <div>
-        <a href="#" class="btn btn-secondary bg-steel"><i class="fa fa-play fa-3x" aria-hidden="true"></i></a>
+        <a href="{{ url_for( 'view_session', session_id = next_ses.id ) }}" class="btn btn-lg btn-secondary bg-steel"><i class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;Start</a>
       </div>
     </div>
   </div>

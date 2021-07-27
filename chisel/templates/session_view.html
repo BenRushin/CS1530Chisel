@@ -3,41 +3,46 @@
 <h2>
   <div class="d-flex justify-content-between">
     <div>
-      Session List
+      {{ ses.name }}
     </div>
     <div>
-      <i class="fa fa-list-alt" aria-hidden="true"></i>
+        {% if ses.type == 1 or ses.type == 5 %}
+        <i class="fas fa-running"></i>
+        {% else %}
+        <i class="fas fa-dumbbell"></i>
+        {% endif %}
     </div>
   </div>
 </h2>
+<p>{{ session_type }}</p>
 <hr>
 <table class="table">
   <thead>
     <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Description</th>
-      <th scope="col">Date</th>
-      <th scope="col">Action</th>
+      <th scope="col">Exercise</th>
+      <th scope="col">Reps</th>
+      <th scope="col">Sets</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
-    {% for ses in ses_list %}
+    <!-- {% for ex in ses_list %}
     <tr>
       <td>{{ ses.name }}</td>
       <td>{{ ses.desc }}</td>
       <td>{{ ses.date.strftime("%m/%d/%Y") }}</td>
-      <td><a href="{{ url_for( 'view_session', session_id = ses.id ) }}" class="btn btn-sm btn-success">Open</a>&nbsp;<a href="{{ url_for( 'delete_session', session_id = ses.id ) }}" class="btn btn-sm btn-danger">Delete</a></td>
+      <td><a href="#" class="btn btn-sm btn-success">Open</a>&nbsp;<a href="{{ url_for( 'delete_session', session_id = ses.id ) }}" class="btn btn-sm btn-danger">Delete</a></td>
     </tr>
-    {% endfor %}
+    {% endfor %} -->
   </tbody>
 </table>
 {% endblock %}
 {% block sidebar %}
 <div class="content-section">
   <div class="list-group">
-    <a href="{{ url_for( 'create_session' ) }}" class="list-group-item list-group-item-action connect-option">
-      Create a New Session
-      <i class="fa fa-plus-circle"></i>
+    <a href="{{ url_for( 'session_list' ) }}" class="list-group-item list-group-item-action connect-option">
+      Session List
+      <i class="fa fa-list-alt"></i>
     </a>
     <a href="{{ url_for( 'dashboard' ) }}" class="list-group-item list-group-item-action connect-option">
       Back to Dashboard

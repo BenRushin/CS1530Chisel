@@ -82,7 +82,7 @@ def session_list():
 @app.route( '/session-list/delete/<session_id>' )
 def delete_session( session_id = None ):
     if not session_id:
-        flash( "This room ID doesn't exist." )
+        flash( "This session ID doesn't exist." )
         return redirect( url_for( 'session_list' ) )
 
     deleted_session_name = WorkoutSession.query.filter_by( id = session_id ).one().name
@@ -93,7 +93,23 @@ def delete_session( session_id = None ):
     flash( "Successfully deleted session " + deleted_session_name )
     return redirect( url_for( 'session_list' ) )
 
+session_types = {
+    1: "Cardio-Only",
+    2: "Upper-body focus",
+    3: "Lower-body focus",
+    4: "Abdominal/core strength",
+    5: "Variety"
+}
 
+@app.route( '/session-list/view/' )
+@app.route( '/session-list/view/<session_id>' )
+def view_session( session_id = None ):
+    if not session_id:
+        flash( "This session ID doesn't exist." )
+        return redirect( url_for( 'session_list' ) )
+
+    this_session = WorkoutSession.query.filter_by( id = session_id ).one()
+    return render_template( 'session_view.html', ses = this_session, session_type = session_types[ this_session.type ] )
 
 @app.route("/logout")
 def logout():
