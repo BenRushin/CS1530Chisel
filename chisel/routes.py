@@ -1,10 +1,12 @@
-import os, secrets
+import os, secrets, random
 from flask import Flask, render_template, url_for, flash, send_from_directory, abort, session, request, redirect
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
-from chisel.models.Customer import Customer, Post
+from chisel.models.Customer import Customer, Post, Exercise, WorkoutSession
 from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
+from datetime import date, datetime
+from sqlalchemy import asc
 
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
@@ -15,7 +17,6 @@ def login():
     if form.validate_on_submit():
         customer = Customer.query.filter_by(email=form.email.data).first()
         if customer and bcrypt.check_password_hash(customer.password, form.password.data):
-            session['customer_username'] = customer.username
             login_user(customer, remember=form.remember.data)
             flash('Successful login!', 'success')
             next_page = request.args.get('next')
@@ -43,8 +44,122 @@ def register():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.now().date(), WorkoutSession.user_id == current_customer.id ).order_by( asc( WorkoutSession.date ) )
 
+    if not upcoming_sessions:
+        return render_template('dashboard.html', username=current_user.username )
+        
+    return render_template('dashboard.html', username=current_user.username, next_ses = upcoming_sessions.first() )
+
+# Workout name, rep count, set count
+workout_examples = {
+    1: [
+        ("Jog in Place (1 rep = 1 sec.)", 60, 3),
+        ("Fast Walk or Brisk Jog (1 rep = 1 mi.)", 1, 1),
+        ("Jumping Jacks", 30, 3),
+        ("Stair Climbing", 10, 1),
+        ("Mountain Climbers", 40, 2)
+    ],
+    2: [
+        ("Push-ups", 15, 3),
+        ("Lateral Pulldown", 10, 3),
+        ("Bicep Curls", 10, 3),
+        ("Bench Press", 10, 3),
+        ("Bent-over Row", 8, 3)
+    ],
+    3: [
+        ("Deadlift", 10, 3),
+        ("Squats", 10, 3),
+        ("Squats", 10, 3),
+    ],
+    4: [
+        ("Sit-ups", 25, 3),
+        ("Plank (1 rep = 1 sec.)", 30, 3),
+        ("Side Plank (1 rep = 1 sec.)", 30, 3),
+    ]
+}
+
+@app.route('/create-session', methods=['GET', 'POST'])
+@login_required
+def create_session():
+    if request.method == 'POST':
+        current_customer = Customer.query.filter_by( username = current_user.username ).first()
+        ses_type = int( request.form[ "sestype" ] )
+        new_session = WorkoutSession( name = request.form[ "sesname" ], desc = request.form[ "sesdesc" ], 
+                                      date = datetime.strptime( request.form[ "sesdate" ], '%Y-%m-%d' ), type = ses_type, user_id = current_customer.id )
+
+        db.session.add( new_session )
+        db.session.commit()
+
+        print( new_session.id )
+        possible_exercises = workout_examples[ ses_type ]
+        
+        random.shuffle( possible_exercises )
+        print( possible_exercises )
+        for i in range(3):
+            this_exercise = possible_exercises[ i ]
+            print( this_exercise )
+            new_exercise = Exercise( name = this_exercise[ 0 ], 
+                            reps = str( this_exercise[ 1 ] ),
+                            sets = this_exercise[ 2 ], session_id = new_session.id )
+            db.session.add( new_exercise )
+
+        db.session.commit()
+        success_str = "Successfully created a new session!"
+        if request.form.get( "sesredir" ):
+            success_str += "\nRedirected to session list."
+            flash( success_str )
+            return redirect( url_for( 'session_list' ) )
+        else:
+            flash( success_str )
+
+    return render_template('create_session.html', username=current_user.username)
+
+
+@app.route('/session-list', methods=['GET', 'POST'])
+@login_required
+def session_list():
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    return render_template('session_list.html', username=current_user.username, ses_list = current_customer.sessions )
+
+
+@app.route( '/session-list/delete/' )
+@app.route( '/session-list/delete/<session_id>' )
+def delete_session( session_id = None ):
+    if not session_id:
+        flash( "This session ID doesn't exist." )
+        return redirect( url_for( 'session_list' ) )
+
+    deleted_session_name = WorkoutSession.query.filter_by( id = session_id ).one().name
+    WorkoutSession.query.filter_by( id = session_id ).delete()
+    Exercise.query.filter( Exercise.session_id == session_id ).delete()
+    db.session.commit()
+
+    
+    flash( "Successfully deleted session " + deleted_session_name )
+    return redirect( url_for( 'session_list' ) )
+
+session_types = {
+    1: "Cardio-Only",
+    2: "Upper-body focus",
+    3: "Lower-body focus",
+    4: "Abdominal/core strength",
+    5: "Variety"
+}
+
+@app.route( '/session-list/view/' )
+@app.route( '/session-list/view/<session_id>' )
+def view_session( session_id = None ):
+    if not session_id:
+        flash( "This session ID doesn't exist." )
+        return redirect( url_for( 'session_list' ) )
+
+    this_session = WorkoutSession.query.filter_by( id = session_id ).one()
+    exercises = this_session.exercises
+    print( exercises )
+    
+    return render_template( 'session_view.html', ses = this_session, session_type = session_types[ this_session.type ], ex_list = exercises )
 
 @app.route("/logout")
 def logout():
@@ -61,13 +176,16 @@ def connect():
     # if we want to query ALL posts, we can use:
     #posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=2)
     
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    customer_post_count = Post.query.filter_by( user_id = current_customer.id ).count()
+
     # and here is the search function
     q = request.args.get('q')
     if q:
         customers = Customer.query.filter(Customer.username.startswith(q) | Customer.email.startswith(q)).limit(10).all()
-        return render_template('connect.html', customers=customers, username=session['customer_username'])
+        return render_template('connect.html', customers=customers, username=current_user.username, post_count = customer_post_count)
     
-    return render_template('connect.html', posts=posts, username=session['customer_username'])
+    return render_template('connect.html', posts=posts, username=current_user.username, post_count = customer_post_count)
 
 
 

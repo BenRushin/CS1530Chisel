@@ -16,6 +16,7 @@ class Customer(db.Model, UserMixin):
     bio = db.Column(db.String(300), nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='author', lazy=True)
+    sessions = db.relationship( 'WorkoutSession', backref='customer' )
 
     followed = db.relationship(
         'Customer', secondary=followers,
@@ -35,7 +36,6 @@ class Customer(db.Model, UserMixin):
         return self.followed.filter(
             followers.c.followed_id == customer.id).count() > 0
 
-    
     def followed_posts(self):
         followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)).filter(
@@ -65,3 +65,19 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+
+class WorkoutSession(db.Model):
+    id = db.Column( db.Integer, primary_key = True )
+    name = db.Column( db.String( 128 ), nullable = False )
+    desc = db.Column( db.Text, nullable = True )
+    date = db.Column( db.DateTime )
+    type = db.Column( db.Integer )
+    user_id = db.Column( db.Integer, db.ForeignKey( 'customer.id' ), nullable = False )
+    exercises = db.relationship( 'Exercise', backref='workout_session' )
+
+class Exercise(db.Model):
+    id = db.Column( db.Integer, primary_key = True )
+    name = db.Column( db.String( 128 ), nullable = False )
+    reps = db.Column( db.Text, nullable = True )
+    sets = db.Column( db.Integer, nullable = False )
+    session_id = db.Column( db.Integer, db.ForeignKey( 'workout_session.id' ), nullable = False )

@@ -50,9 +50,9 @@
       {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
           {% if posts.page == page_num %}
-            <a class="btn btn-secondary mb-4" href="{{ url_for('connect', page=page_num) }}">{{ page_num }}</a>
+            <a class="btn btn-secondary mb-4 bg-steel" href="{{ url_for('connect', page=page_num) }}">{{ page_num }}</a>
           {% else %}
-            <a class="btn btn-outline-secondary mb-4" href="{{ url_for('connect', page=page_num) }}">{{ page_num }}</a>
+            <a class="btn btn-outline-secondary mb-4 bg-steel" href="{{ url_for('connect', page=page_num) }}">{{ page_num }}</a>
           {% endif %}
         {% else %}
           ...
@@ -64,14 +64,14 @@
 {% block sidebar %}
 <div class="content-section">
   <div style="text-align: center">
-    <h3>Hello, {{username}}!</h3>
-    <h6>X posts</h6>
+    <h3>{{username}}</h3>
+    <h6>{% if post_count > 0 %}{{ post_count }}{% else %}No{% endif %} posts</h6>
   </div>
   <hr>
   <div class="list-group">
     <a href="#" class="list-group-item list-group-item-action active connect-option">
-        All Activity
-        <i class="fa fa-users"></i>
+      All Activity
+      <i class="fa fa-users"></i>
     </a>
     <a href="#" class="list-group-item list-group-item-action connect-option">
       Your Posts
@@ -82,7 +82,7 @@
       <i class="fa fa-commenting-o"></i>
     </a>
     <a href="#" class="list-group-item list-group-item-action connect-option">
-      Settings
+      Social Preferences
       <i class="fa fa-sliders"></i>
     </a>
     <a href="#" class="list-group-item list-group-item-action disabled connect-option" tabindex="-1" aria-disabled="true">

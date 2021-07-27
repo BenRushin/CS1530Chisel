@@ -65,6 +65,11 @@ a.article-title:hover {
   margin-right: 16px;
 }
 
+.active {
+  border-color: #5f788a !important;
+  background-color: #5f788a !important;
+}
+
 .article-metadata {
   padding-bottom: 1px;
   margin-bottom: 4px;
