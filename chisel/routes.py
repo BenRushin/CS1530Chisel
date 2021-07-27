@@ -43,8 +43,13 @@ def register():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html', username=current_user.username)
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.today(), WorkoutSession.user_id == current_customer.id )
 
+    if not upcoming_sessions:
+        return render_template('dashboard.html', username=current_user.username )
+        
+    return render_template('dashboard.html', username=current_user.username, next_ses = upcoming_sessions.first() )
     
 @app.route('/create-session', methods=['GET', 'POST'])
 @login_required
@@ -70,8 +75,24 @@ def create_session():
 @login_required
 def session_list():
     current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    print( current_customer.sessions )
     return render_template('session_list.html', username=current_user.username, ses_list = current_customer.sessions )
+
+
+@app.route( '/session-list/delete/' )
+@app.route( '/session-list/delete/<session_id>' )
+def delete_session( session_id = None ):
+    if not session_id:
+        flash( "This room ID doesn't exist." )
+        return redirect( url_for( 'session_list' ) )
+
+    deleted_session_name = WorkoutSession.query.filter_by( id = session_id ).one().name
+    WorkoutSession.query.filter_by( id = session_id ).delete()
+    db.session.commit()
+
+    
+    flash( "Successfully deleted session " + deleted_session_name )
+    return redirect( url_for( 'session_list' ) )
+
 
 
 @app.route("/logout")

@@ -26,7 +26,7 @@
       <td>{{ ses.name }}</td>
       <td>{{ ses.desc }}</td>
       <td>{{ ses.date.strftime("%m/%d/%Y") }}</td>
-      <td><a href="#" class="btn btn-sm btn-success">Open</a></td>
+      <td><a href="#" class="btn btn-sm btn-success">Open</a>&nbsp;<a href="{{ url_for( 'delete_session', session_id = ses.id ) }}" class="btn btn-sm btn-danger">Delete</a></td>
     </tr>
     {% endfor %}
   </tbody>

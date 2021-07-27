@@ -15,12 +15,13 @@
   </div>
 </div>
 <br/>
+{% if next_ses %}
 <div class="card">
   <div class="card-body">
     <div class="d-flex justify-content-between">
       <div>
         <h5>Next scheduled session</h5>
-        Your next session, session name, is scheduled for X.
+        Your next session, {{ next_ses.name }}, is scheduled for {{ next_ses.date.strftime("%m/%d/%Y") }}.
       </div>
       <div>
         <a href="#" class="btn btn-secondary bg-steel"><i class="fa fa-play fa-3x" aria-hidden="true"></i></a>
@@ -29,6 +30,7 @@
   </div>
 </div>
 <br/>
+{% endif %}
 {% endblock %}
 {% block sidebar %}
 <div class="content-section">
