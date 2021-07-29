@@ -2,7 +2,8 @@ import os, secrets, random
 from flask import Flask, render_template, url_for, flash, send_from_directory, abort, session, request, redirect
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
-from chisel.models.Customer import Customer, Post, Exercise, WorkoutSession
+from chisel.models.Customer import Customer, Post
+from chisel.models.Workout import Exercise, WorkoutSession, ExerciseStatus
 from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
 from datetime import date, datetime
@@ -45,7 +46,8 @@ def register():
 @login_required
 def dashboard():
     current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.now().date(), WorkoutSession.user_id == current_customer.id ).order_by( asc( WorkoutSession.date ) )
+    upcoming_sessions = WorkoutSession.query.filter( WorkoutSession.date >= datetime.now().date(), 
+    WorkoutSession.user_id == current_customer.id, WorkoutSession.completed == False ).order_by( asc( WorkoutSession.date ) )
 
     if not upcoming_sessions:
         return render_template('dashboard.html', username=current_user.username )
@@ -80,6 +82,31 @@ workout_examples = {
     ]
 }
 
+@app.route( '/workout/update/<session_id>/<workout_id>', methods=['POST'] )
+def complete_workout( session_id = None, workout_id = None ):
+    if not session_id or not workout_id:
+        return redirect( url_for( 'session_list' ) )
+    
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    current_session = WorkoutSession.query.filter( WorkoutSession.id == session_id ).one()
+    exercise_to_update = Exercise.query.filter( Exercise.session_id == session_id, Exercise.id == workout_id ).one()
+
+    exercise_to_update.status = 3
+    session_complete = True
+    for e in current_session.exercises:
+        if e.status == 0:
+            session_complete = False
+            break
+
+    current_session.completed = session_complete
+    if current_session.completed:
+        flash( "Congratulations! You have completed your session." )
+
+    db.session.commit()
+    
+    return redirect( url_for( 'view_session', session_id = session_id ) )
+
+
 @app.route('/create-session', methods=['GET', 'POST'])
 @login_required
 def create_session():
@@ -87,7 +114,7 @@ def create_session():
         current_customer = Customer.query.filter_by( username = current_user.username ).first()
         ses_type = int( request.form[ "sestype" ] )
         new_session = WorkoutSession( name = request.form[ "sesname" ], desc = request.form[ "sesdesc" ], 
-                                      date = datetime.strptime( request.form[ "sesdate" ], '%Y-%m-%d' ), type = ses_type, user_id = current_customer.id )
+                                      date = datetime.strptime( request.form[ "sesdate" ], '%Y-%m-%d' ), type = ses_type, user_id = current_customer.id, completed = False )
 
         db.session.add( new_session )
         db.session.commit()
@@ -102,7 +129,7 @@ def create_session():
             print( this_exercise )
             new_exercise = Exercise( name = this_exercise[ 0 ], 
                             reps = str( this_exercise[ 1 ] ),
-                            sets = this_exercise[ 2 ], session_id = new_session.id )
+                            sets = this_exercise[ 2 ], session_id = new_session.id, status = 0 )
             db.session.add( new_exercise )
 
         db.session.commit()
@@ -121,7 +148,16 @@ def create_session():
 @login_required
 def session_list():
     current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    return render_template('session_list.html', username=current_user.username, ses_list = current_customer.sessions )
+    current_sessions = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id, WorkoutSession.completed == False ).all()
+    return render_template('session_list.html', username=current_user.username, ses_list = current_sessions )
+
+
+@app.route('/session-history', methods=['GET', 'POST'])
+@login_required
+def session_history():
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    prev_sessions = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id, WorkoutSession.completed == True ).all()
+    return render_template('session_history.html', username=current_user.username, ses_list = prev_sessions )
 
 
 @app.route( '/session-list/delete/' )
@@ -157,8 +193,7 @@ def view_session( session_id = None ):
 
     this_session = WorkoutSession.query.filter_by( id = session_id ).one()
     exercises = this_session.exercises
-    print( exercises )
-    
+
     return render_template( 'session_view.html', ses = this_session, session_type = session_types[ this_session.type ], ex_list = exercises )
 
 @app.route("/logout")
