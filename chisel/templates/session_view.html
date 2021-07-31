@@ -31,7 +31,11 @@
       <td>{{ ex.name }}</td>
       <td>{{ ex.reps }}</td>
       <td>{{ ex.sets }}</td>
-      <td><a href="#" class="btn btn-sm btn-success">Done</a>&nbsp;<a href="#" class="btn btn-sm btn-warning">Incomplete</a>&nbsp;<a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></a></td>
+      {% if ex.status == 3 %}
+      <td>Completed</td>
+      {% else %}
+      <td><form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id ) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-success">Done</button></form>&nbsp;<a href="#" class="btn btn-sm btn-warning">Incomplete</a>&nbsp;<a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></a></td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
@@ -40,10 +44,17 @@
 {% block sidebar %}
 <div class="content-section">
   <div class="list-group">
+    {% if not ses.completed %}
     <a href="{{ url_for( 'session_list' ) }}" class="list-group-item list-group-item-action connect-option">
       Session List
       <i class="fa fa-list-alt"></i>
     </a>
+    {% else %}
+    <a href="{{ url_for( 'session_history' ) }}" class="list-group-item list-group-item-action connect-option">
+      Session History
+      <i class="fa fa-history"></i>
+    </a>
+    {% endif %}
     <a href="{{ url_for( 'dashboard' ) }}" class="list-group-item list-group-item-action connect-option">
       Back to Dashboard
       <i class="fa fa-home" aria-hidden="true"></i>
