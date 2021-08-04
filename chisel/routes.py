@@ -73,7 +73,7 @@ workout_examples = {
     3: [
         ("Deadlift", 10, 3, 10),
         ("Squats", 10, 3, 11),
-        ("Squats", 10, 3, 12),
+        ("Lunges", 20, 3, 12),
     ],
     4: [
         ("Sit-ups", 25, 3, 13),
@@ -81,6 +81,30 @@ workout_examples = {
         ("Side Plank (1 rep = 1 sec.)", 30, 3, 15),
     ]
 }
+
+@app.route( '/workout/update/<session_id>/<workout_id>/cancel', methods=['POST'] )
+def cancel_workout( session_id = None, workout_id = None ):
+    if not session_id or not workout_id:
+        return redirect( url_for( 'session_list' ) )
+
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    current_session = WorkoutSession.query.filter( WorkoutSession.id == session_id ).one()
+    exercise_to_update = Exercise.query.filter( Exercise.session_id == session_id, Exercise.id == workout_id ).one()\
+
+    exercise_to_update.status = 1
+    session_complete = True
+    for e in current_session.exercises:
+        if e.status == 0:
+            session_complete = False
+            break
+
+    current_session.completed = session_complete
+    if current_session.completed:
+        flash( "Congratulations! You have completed your session.", 'success' )
+    
+    db.session.commit()
+    return redirect( url_for( 'view_session', session_id = session_id ) )
+
 
 @app.route( '/workout/update/<session_id>/<workout_id>/<tooHard>', methods=['POST'] )
 @app.route( '/workout/update/<session_id>/<workout_id>/0/<tooEasy>', methods=['POST'] )
@@ -145,14 +169,14 @@ def create_session():
         db.session.add( new_session )
         db.session.commit()
 
-        print( new_session.id )
+        # print( new_session.id )
         possible_exercises = workout_examples[ ses_type ]
         
         random.shuffle( possible_exercises )
-        print( possible_exercises )
+        # print( possible_exercises )
         for i in range(3):
             this_exercise = possible_exercises[ i ]
-            print( this_exercise )
+            # print( this_exercise )
             final_reps = this_exercise[ 1 ]
             final_sets = this_exercise[ 2 ]
             exercise_mods = ExerciseModifier.query.filter( ExerciseModifier.exercise_id == this_exercise[ 3 ], ExerciseModifier.user_id == current_customer.id ).all()
@@ -169,10 +193,10 @@ def create_session():
         success_str = "Successfully created a new session!"
         if request.form.get( "sesredir" ):
             success_str += "\nRedirected to session list."
-            flash( success_str )
+            flash( success_str, 'success' )
             return redirect( url_for( 'session_list' ) )
         else:
-            flash( success_str )
+            flash( success_str, 'success' )
 
     return render_template('create_session.html', username=current_user.username)
 
@@ -197,7 +221,7 @@ def session_history():
 @app.route( '/session-list/delete/<session_id>' )
 def delete_session( session_id = None ):
     if not session_id:
-        flash( "This session ID doesn't exist." )
+        flash( "This session ID doesn't exist.", 'danger' )
         return redirect( url_for( 'session_list' ) )
 
     deleted_session_name = WorkoutSession.query.filter_by( id = session_id ).one().name
@@ -206,7 +230,7 @@ def delete_session( session_id = None ):
     db.session.commit()
 
     
-    flash( "Successfully deleted session " + deleted_session_name )
+    flash( "Successfully deleted session " + deleted_session_name, 'success' )
     return redirect( url_for( 'session_list' ) )
 
 session_types = {
@@ -221,7 +245,7 @@ session_types = {
 @app.route( '/session-list/view/<session_id>' )
 def view_session( session_id = None ):
     if not session_id:
-        flash( "This session ID doesn't exist." )
+        flash( "This session ID doesn't exist.", 'danger' )
         return redirect( url_for( 'session_list' ) )
 
     this_session = WorkoutSession.query.filter_by( id = session_id ).one()
