@@ -83,7 +83,7 @@ workout_examples = {
 }
 
 @app.route( '/workout/update/<session_id>/<workout_id>/<tooHard>', methods=['POST'] )
-@app.route( '/workout/update/<session_id>/<workout_id>/<tooEasy>', methods=['POST'] )
+@app.route( '/workout/update/<session_id>/<workout_id>/0/<tooEasy>', methods=['POST'] )
 @app.route( '/workout/update/<session_id>/<workout_id>', methods=['POST'] )
 def complete_workout( session_id = None, workout_id = None, tooHard = False, tooEasy = False):
     if not session_id or not workout_id:
