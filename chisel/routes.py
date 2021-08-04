@@ -89,7 +89,7 @@ def cancel_workout( session_id = None, workout_id = None ):
 
     current_customer = Customer.query.filter_by( username = current_user.username ).first()
     current_session = WorkoutSession.query.filter( WorkoutSession.id == session_id ).one()
-    exercise_to_update = Exercise.query.filter( Exercise.session_id == session_id, Exercise.id == workout_id ).one()\
+    exercise_to_update = Exercise.query.filter( Exercise.session_id == session_id, Exercise.id == workout_id ).one()
 
     exercise_to_update.status = 1
     session_complete = True
@@ -216,6 +216,27 @@ def session_history():
     prev_sessions = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id, WorkoutSession.completed == True ).all()
     return render_template('session_history.html', username=current_user.username, ses_list = prev_sessions )
 
+
+@app.route('/stats', methods=['GET'])
+@login_required
+def statistics():
+    current_customer = Customer.query.filter_by( username = current_user.username ).first()
+    total_ses_count = WorkoutSession.query.filter_by( user_id = current_customer.id ).count()
+    completed_ses_count = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id, WorkoutSession.completed == True ).count()
+
+    uncompleted_ses_count = total_ses_count - completed_ses_count
+    exercises_completed = 0
+    exercises_skipped = 0
+
+    all_sessions = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id ).all()
+    for ses in all_sessions:
+        completed_count = Exercise.query.filter( Exercise.session_id == ses.id, Exercise.status == 3 ).count()
+        skipped_count = Exercise.query.filter( Exercise.session_id == ses.id, Exercise.status == 1 ).count()
+        exercises_completed += completed_count
+        exercises_skipped += skipped_count
+
+    return render_template('stats.html', username=current_user.username, total_count = total_ses_count, 
+    completed_count = completed_ses_count, uncompleted_ses = uncompleted_ses_count, completed_ex = exercises_completed, skipped_ex = skipped_count )
 
 @app.route( '/session-list/delete/' )
 @app.route( '/session-list/delete/<session_id>' )
