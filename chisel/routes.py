@@ -82,8 +82,10 @@ workout_examples = {
     ]
 }
 
+@app.route( '/workout/update/<session_id>/<workout_id>/<tooHard>', methods=['POST'] )
+@app.route( '/workout/update/<session_id>/<workout_id>/<tooEasy>', methods=['POST'] )
 @app.route( '/workout/update/<session_id>/<workout_id>', methods=['POST'] )
-def complete_workout( session_id = None, workout_id = None ):
+def complete_workout( session_id = None, workout_id = None, tooHard = False, tooEasy = False):
     if not session_id or not workout_id:
         return redirect( url_for( 'session_list' ) )
     
@@ -98,9 +100,23 @@ def complete_workout( session_id = None, workout_id = None ):
             session_complete = False
             break
 
+    if tooEasy:
+        if  int(exercise_to_update.reps) < 12:
+            exercise_to_update.reps = str(int(exercise_to_update.reps)+1) 
+        else:
+            exercise_to_update.sets += 1
+        flash("Exercise was made harder!", 'success')
+    
+    if tooHard:
+        if int(exercise_to_update.reps) > 8:
+            exercise_to_update.reps = str(int(exercise_to_update.reps)-1) 
+        else:
+            exercise_to_update.sets -= 1
+        flash("Exercise was made easier!", 'success')
+
     current_session.completed = session_complete
     if current_session.completed:
-        flash( "Congratulations! You have completed your session." )
+        flash( "Congratulations! You have completed your session.", 'success' )
 
     db.session.commit()
     
