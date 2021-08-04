@@ -24,7 +24,16 @@ class Exercise(db.Model):
     name = db.Column( db.String( 128 ), nullable = False )
     reps = db.Column( db.Text, nullable = True )
     sets = db.Column( db.Integer, nullable = False )
+    unique_id_in_dict = db.Column( db.Integer )
+    customer_responded = db.Column( db.Boolean )
     session_id = db.Column( db.Integer, db.ForeignKey( 'workout_session.id' ), nullable = False )
     status = db.Column( db.Integer )
     # completed_reps = db.Column( db.Integer )
     # completed_sets = db.Column( db.Integer )
+
+class ExerciseModifier( db.Model ):
+    id = db.Column( db.Integer, primary_key = True )
+    exercise_id = db.Column( db.Integer, nullable = False )
+    rep_modifier = db.Column( db.Integer )
+    set_modifier = db.Column( db.Integer )
+    user_id = db.Column( db.Integer, db.ForeignKey( 'customer.id' ), nullable = False )

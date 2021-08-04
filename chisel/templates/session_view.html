@@ -31,13 +31,19 @@
       <td>{{ ex.name }}</td>
       <td>{{ ex.reps }}</td>
       <td>{{ ex.sets }}</td>
-      {% if ex.status == 3 %}
+      {% if ses.completed %}
+      <td>Completed</td>
+      {% elif ex.status == 3 %}
       <td>
-            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooEasy=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-info">Too Easy?</button></form>
-            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooHard=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-secondary">Too Hard?</button></form>
+          {% if not ex.customer_responded %}
+            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooEasy=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-info">Too easy?</button></form>
+            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooHard=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-secondary">Too hard?</button></form>
+          {% else %}
+          Completed
+          {% endif %}
       </td>
       {% else %}
-      <td><form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id ) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-success">Done</button></form>&nbsp;<a href="#" class="btn btn-sm btn-warning">Incomplete</a>&nbsp;<a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></a></td>
+      <td><form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id ) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-success">Done</button></form>&nbsp;<a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></a></td>
       {% endif %}
     </tr>
     {% endfor %}
