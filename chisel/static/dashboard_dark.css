@@ -1,0 +1,150 @@
+body {
+    background: #1a1a1a;
+    color: #e6e6e6;
+    margin-top: 5rem;
+  }
+  
+h1, h2, h3, h4, h5, h6 {
+  color: #cccccc;
+}
+.table{
+	color: #cccccc;
+}
+.list-group-item{
+	color: #cccccc;
+	background-color: #2a2a2a;
+}
+.form-control{
+	background-color: #c1c1c1;
+}
+.connect-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bg-steel {
+  background-color: #546978;
+}
+
+#main-content {
+  margin-top: 5%;
+}
+
+#connect-toolbar {
+  margin-bottom: 2%;
+}
+
+.site-header .navbar-nav .nav-link {
+  color: #cbd5db;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+
+.content-section {
+  background: #1a1a1a;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+
+.article-title {
+  color: #cccccc;
+  text-decoration: none;
+}
+
+a.article-title:hover {
+  color: #428bca;
+}
+
+.article-content {
+  white-space: pre-line;
+}
+
+.article-img {
+  height: 65px;
+  width: 65px;
+  margin-right: 16px;
+}
+
+.active {
+  border-color: #5f788a !important;
+  background-color: #5f788a !important;
+}
+
+.article-metadata {
+  padding-bottom: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e3e3e3
+}
+
+.article-metadata a:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.article-svg {
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+}
+
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
+}
+
+.username {
+  font-size: 3rem;
+}
+
+.search-username {
+  font-size: 1.5rem;
+}
+
+.bio {
+  margin-top: 25px;
+}
+
+.username-email-pairing {
+  display: inline-block;
+}
+
+.followers-following {
+  font-weight: 600;
+  color:rgba(95, 91, 91, 0.719);
+  font-size: large;
+}
+
+.profile-img {
+  height: 130px;
+  width: 130px;
+  margin-right: 16px;
+}
+
+@media (max-width: 767px) {
+#dropdown-menu {
+  display: none;
+  }
+#unpack-menu {
+  display: block;
+  }  
+}
+@media (min-width: 767px) {
+  #unpack-menu {
+    display: none;
+    }  
+  }

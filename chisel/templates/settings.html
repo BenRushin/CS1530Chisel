@@ -1,0 +1,12 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<div class="content-section">
+	<form action="" method="POST" name="save_settings">
+		<div class="mb-3 form-check">
+			<input type="checkbox" class="form-check-input" name="darkmode" {% if darkmode_enabled %} checked {% endif %} >
+			<label class="form-check-label" for="darkmode">Use Darkmode</label>
+		</div>
+		<button type="submit" class="btn btn-success">Save Settings</button>
+	</form>
+</div>
+{% endblock content %}
