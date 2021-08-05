@@ -169,7 +169,7 @@ def create_session():
         db.session.commit()
 
         # print( new_session.id )
-        possible_exercises = workout_examples[ ses_type ]
+        possible_exercises = workout_examples[ ses_type ] if ses_type != 5 else workout_examples[ random.randint( 1, 4 ) ]
         
         random.shuffle( possible_exercises )
         # print( possible_exercises )
@@ -187,6 +187,10 @@ def create_session():
                             reps = str( final_reps ),
                             sets = final_sets, session_id = new_session.id, unique_id_in_dict = this_exercise[ 3 ], customer_responded = False, status = 0 )
             db.session.add( new_exercise )
+
+            if ses_type == 5:
+                possible_exercises = workout_examples[ random.randint( 1, 4 ) ]
+                random.shuffle( possible_exercises )
 
         db.session.commit()
         success_str = "Successfully created a new session!"
