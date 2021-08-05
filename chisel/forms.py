@@ -62,7 +62,8 @@ class UpdateProfileForm(FlaskForm):
             customer = Customer.query.filter_by(email=email.data).first()
             if customer:
                 raise ValidationError('That email is already taken.')
-
+                
+                
 # used for follow/unfollow 
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')

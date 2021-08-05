@@ -17,6 +17,7 @@ class Customer(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='author', lazy=True)
     sessions = db.relationship( 'WorkoutSession', backref='customer' )
+    dark_mode = db.Column(db.Boolean(), nullable=True)
 
     followed = db.relationship(
         'Customer', secondary=followers,
@@ -45,7 +46,7 @@ class Customer(db.Model, UserMixin):
         own = Post.query.filter_by(user_id=self.id)
         admin = Post.query.filter_by(user_id=1) 
         return followed.union(own).union(admin).order_by(Post.date_posted.desc())
-
+    
     def __repr__(self):
         return '<User %r>' % self.username
 

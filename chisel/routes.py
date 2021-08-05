@@ -9,7 +9,7 @@ from PIL import Image
 from datetime import date, datetime
 from sqlalchemy import asc
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -34,7 +34,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        customer = Customer(username=form.username.data, email=form.email.data, password=hashed_pw, bio="")
+        customer = Customer(username=form.username.data, email=form.email.data, password=hashed_pw, bio="",dark_mode=False)
         db.session.add(customer)
         db.session.commit()
         flash(f'Welcome to Chisel, {form.username.data}!', 'success')
@@ -325,6 +325,18 @@ def profile():
     return render_template('profile.html', title='Your Profile',
                            image_file=image_file, form=form)
 
+
+@app.route("/settings", methods=['GET','POST'])
+@login_required
+def settings():
+    if request.method == "POST":
+        if(request.form.get("darkmode")=="on"):
+            current_user.dark_mode = True
+        else:
+            current_user.dark_mode = False
+        db.session.commit()
+    return render_template('settings.html', title='Your Settings', darkmode_enabled=current_user.dark_mode)
+    
 
 
 @app.route('/follow/<username>', methods=['POST'])
