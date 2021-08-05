@@ -17,7 +17,7 @@ class Customer(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='author', lazy=True)
     sessions = db.relationship( 'WorkoutSession', backref='customer' )
-    dark_mode = db.Column(db.Boolean(), nullable=True)
+    dark_mode = db.Column(db.Boolean(), nullable=False, default=True)
     modifiers = db.relationship( 'ExerciseModifier', backref='customer' )
 
     followed = db.relationship(
