@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for, flash, send_from_directory, a
 from flask_login import login_user, logout_user, login_required, current_user
 from chisel import app, db, bcrypt
 from chisel.models.Customer import Customer, Post
-from chisel.models.Workout import Exercise, WorkoutSession, ExerciseModifier, ExerciseStatus
+from chisel.models.Workout import Exercise, WorkoutSession, ExerciseStatus
 from chisel.forms import RegistrationForm, LoginForm, EmptyForm, UpdateProfileForm, PostForm
 from PIL import Image
 from datetime import date, datetime
@@ -57,59 +57,33 @@ def dashboard():
 # Workout name, rep count, set count
 workout_examples = {
     1: [
-        ("Jog in Place (1 rep = 1 sec.)", 60, 3, 0),
-        ("Fast Walk or Brisk Jog (1 rep = 1 mi.)", 1, 1, 1),
-        ("Jumping Jacks", 30, 3, 2),
-        ("Stair Climbing", 10, 1, 3),
-        ("Mountain Climbers", 40, 2, 4)
+        ("Jog in Place (1 rep = 1 sec.)", 60, 3),
+        ("Fast Walk or Brisk Jog (1 rep = 1 mi.)", 1, 1),
+        ("Jumping Jacks", 30, 3),
+        ("Stair Climbing", 10, 1),
+        ("Mountain Climbers", 40, 2)
     ],
     2: [
-        ("Push-ups", 15, 3, 5),
-        ("Lateral Pulldown", 10, 3, 6),
-        ("Bicep Curls", 10, 3, 7),
-        ("Bench Press", 10, 3, 8),
-        ("Bent-over Row", 8, 3, 9)
+        ("Push-ups", 15, 3),
+        ("Lateral Pulldown", 10, 3),
+        ("Bicep Curls", 10, 3),
+        ("Bench Press", 10, 3),
+        ("Bent-over Row", 8, 3)
     ],
     3: [
-        ("Deadlift", 10, 3, 10),
-        ("Squats", 10, 3, 11),
-        ("Lunges", 20, 3, 12),
+        ("Deadlift", 10, 3),
+        ("Squats", 10, 3),
+        ("Squats", 10, 3),
     ],
     4: [
-        ("Sit-ups", 25, 3, 13),
-        ("Plank (1 rep = 1 sec.)", 30, 3, 14),
-        ("Side Plank (1 rep = 1 sec.)", 30, 3, 15),
+        ("Sit-ups", 25, 3),
+        ("Plank (1 rep = 1 sec.)", 30, 3),
+        ("Side Plank (1 rep = 1 sec.)", 30, 3),
     ]
 }
 
-@app.route( '/workout/update/<session_id>/<workout_id>/cancel', methods=['POST'] )
-def cancel_workout( session_id = None, workout_id = None ):
-    if not session_id or not workout_id:
-        return redirect( url_for( 'session_list' ) )
-
-    current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    current_session = WorkoutSession.query.filter( WorkoutSession.id == session_id ).one()
-    exercise_to_update = Exercise.query.filter( Exercise.session_id == session_id, Exercise.id == workout_id ).one()
-
-    exercise_to_update.status = 1
-    session_complete = True
-    for e in current_session.exercises:
-        if e.status == 0:
-            session_complete = False
-            break
-
-    current_session.completed = session_complete
-    if current_session.completed:
-        flash( "Congratulations! You have completed your session.", 'success' )
-    
-    db.session.commit()
-    return redirect( url_for( 'view_session', session_id = session_id ) )
-
-
-@app.route( '/workout/update/<session_id>/<workout_id>/<tooHard>', methods=['POST'] )
-@app.route( '/workout/update/<session_id>/<workout_id>/0/<tooEasy>', methods=['POST'] )
 @app.route( '/workout/update/<session_id>/<workout_id>', methods=['POST'] )
-def complete_workout( session_id = None, workout_id = None, tooHard = False, tooEasy = False):
+def complete_workout( session_id = None, workout_id = None ):
     if not session_id or not workout_id:
         return redirect( url_for( 'session_list' ) )
     
@@ -124,32 +98,9 @@ def complete_workout( session_id = None, workout_id = None, tooHard = False, too
             session_complete = False
             break
 
-    cur_reps = exercise_to_update.reps
-    cur_sets = exercise_to_update.sets
-
-    if tooEasy:
-        if  int(cur_reps) < 12:
-            cur_reps = str(int(cur_reps)+3) 
-        else:
-            cur_sets += 1
-        flash("Exercise was made harder!", 'success')
-
-    
-    if tooHard:
-        if int(cur_reps) > 8:
-            cur_reps = str(int(cur_reps)-5) 
-        else:
-            cur_sets -= 1
-        flash("Exercise was made easier!", 'success')
-
-    exercise_to_update.customer_responded = True
-
-    db.session.add( ExerciseModifier( exercise_id = exercise_to_update.unique_id_in_dict, rep_modifier = cur_reps, set_modifier = cur_sets, user_id = current_customer.id ) )
-    db.session.commit()
-
     current_session.completed = session_complete
     if current_session.completed:
-        flash( "Congratulations! You have completed your session.", 'success' )
+        flash( "Congratulations! You have completed your session." )
 
     db.session.commit()
     
@@ -168,38 +119,27 @@ def create_session():
         db.session.add( new_session )
         db.session.commit()
 
-        # print( new_session.id )
-        possible_exercises = workout_examples[ ses_type ] if ses_type != 5 else workout_examples[ random.randint( 1, 4 ) ]
+        print( new_session.id )
+        possible_exercises = workout_examples[ ses_type ]
         
         random.shuffle( possible_exercises )
-        # print( possible_exercises )
+        print( possible_exercises )
         for i in range(3):
             this_exercise = possible_exercises[ i ]
-            # print( this_exercise )
-            final_reps = this_exercise[ 1 ]
-            final_sets = this_exercise[ 2 ]
-            exercise_mods = ExerciseModifier.query.filter( ExerciseModifier.exercise_id == this_exercise[ 3 ], ExerciseModifier.user_id == current_customer.id ).all()
-            for em in exercise_mods:
-                final_reps = em.rep_modifier
-                final_sets = em.set_modifier
-
+            print( this_exercise )
             new_exercise = Exercise( name = this_exercise[ 0 ], 
-                            reps = str( final_reps ),
-                            sets = final_sets, session_id = new_session.id, unique_id_in_dict = this_exercise[ 3 ], customer_responded = False, status = 0 )
+                            reps = str( this_exercise[ 1 ] ),
+                            sets = this_exercise[ 2 ], session_id = new_session.id, status = 0 )
             db.session.add( new_exercise )
-
-            if ses_type == 5:
-                possible_exercises = workout_examples[ random.randint( 1, 4 ) ]
-                random.shuffle( possible_exercises )
 
         db.session.commit()
         success_str = "Successfully created a new session!"
         if request.form.get( "sesredir" ):
             success_str += "\nRedirected to session list."
-            flash( success_str, 'success' )
+            flash( success_str )
             return redirect( url_for( 'session_list' ) )
         else:
-            flash( success_str, 'success' )
+            flash( success_str )
 
     return render_template('create_session.html', username=current_user.username)
 
@@ -220,32 +160,11 @@ def session_history():
     return render_template('session_history.html', username=current_user.username, ses_list = prev_sessions )
 
 
-@app.route('/stats', methods=['GET'])
-@login_required
-def statistics():
-    current_customer = Customer.query.filter_by( username = current_user.username ).first()
-    total_ses_count = WorkoutSession.query.filter_by( user_id = current_customer.id ).count()
-    completed_ses_count = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id, WorkoutSession.completed == True ).count()
-
-    uncompleted_ses_count = total_ses_count - completed_ses_count
-    exercises_completed = 0
-    exercises_skipped = 0
-
-    all_sessions = WorkoutSession.query.filter( WorkoutSession.user_id == current_customer.id ).all()
-    for ses in all_sessions:
-        completed_count = Exercise.query.filter( Exercise.session_id == ses.id, Exercise.status == 3 ).count()
-        skipped_count = Exercise.query.filter( Exercise.session_id == ses.id, Exercise.status == 1 ).count()
-        exercises_completed += completed_count
-        exercises_skipped += skipped_count
-
-    return render_template('stats.html', username=current_user.username, total_count = total_ses_count, 
-    completed_count = completed_ses_count, uncompleted_ses = uncompleted_ses_count, completed_ex = exercises_completed, skipped_ex = exercises_skipped )
-
 @app.route( '/session-list/delete/' )
 @app.route( '/session-list/delete/<session_id>' )
 def delete_session( session_id = None ):
     if not session_id:
-        flash( "This session ID doesn't exist.", 'danger' )
+        flash( "This session ID doesn't exist." )
         return redirect( url_for( 'session_list' ) )
 
     deleted_session_name = WorkoutSession.query.filter_by( id = session_id ).one().name
@@ -254,7 +173,7 @@ def delete_session( session_id = None ):
     db.session.commit()
 
     
-    flash( "Successfully deleted session " + deleted_session_name, 'success' )
+    flash( "Successfully deleted session " + deleted_session_name )
     return redirect( url_for( 'session_list' ) )
 
 session_types = {
@@ -269,7 +188,7 @@ session_types = {
 @app.route( '/session-list/view/<session_id>' )
 def view_session( session_id = None ):
     if not session_id:
-        flash( "This session ID doesn't exist.", 'danger' )
+        flash( "This session ID doesn't exist." )
         return redirect( url_for( 'session_list' ) )
 
     this_session = WorkoutSession.query.filter_by( id = session_id ).one()
@@ -299,7 +218,7 @@ def connect():
     q = request.args.get('q')
     if q:
         customers = Customer.query.filter(Customer.username.startswith(q) | Customer.email.startswith(q)).limit(10).all()
-        return render_template('connect.html', customers=customers, posts=posts, username=current_user.username, post_count = customer_post_count)
+        return render_template('connect.html', customers=customers, username=current_user.username, post_count = customer_post_count)
     
     return render_template('connect.html', posts=posts, username=current_user.username, post_count = customer_post_count)
 
@@ -367,7 +286,7 @@ def user_posts(username):
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=5)
     form = EmptyForm()
-    return render_template('user_posts.html', posts=posts, user=customer, username = current_user.username, form=form)
+    return render_template('user_posts.html', posts=posts, user=customer, form=form)
 
 
 def save_picture(form_picture):
@@ -404,7 +323,7 @@ def profile():
         form.bio.data = current_user.bio
     image_file = url_for('static', filename='images/profile_pics/'+current_user.image_file)
     return render_template('profile.html', title='Your Profile',
-                           image_file=image_file, username = current_user.username, form=form)
+                           image_file=image_file, form=form)
 
 
 @app.route("/settings", methods=['GET','POST'])

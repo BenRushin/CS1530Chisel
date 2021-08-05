@@ -11,7 +11,7 @@
       <i class="fa fa-list-alt"></i><br/>Session List
     </a>
     <a href="{{ url_for( 'session_history' ) }}" class="btn btn-secondary bg-steel"><i class="fa fa-history"></i><br/>Session History</a>
-    <a href="{{ url_for( 'statistics' ) }}" class="btn btn-secondary bg-steel"><i class="fa fa-bar-chart" aria-hidden="true"></i><br/>Statistics</a>
+    <button type="button" class="btn btn-secondary bg-steel"><i class="fa fa-bar-chart" aria-hidden="true"></i><br/>Statistics</button>
   </div>
 </div>
 <br/>
@@ -39,9 +39,9 @@
   <div class="list-group">
     <a href="/settings" class="list-group-item list-group-item-action connect-option">
       Account Settings
-    <i class="fa fa-sliders"></i>
+      <i class="fa fa-sliders"></i>
     </a>
-    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action connect-option">
+    <a href="#" class="list-group-item list-group-item-action connect-option">
       Log Out
       <i class="fa fa-sign-out"></i>
     </a>

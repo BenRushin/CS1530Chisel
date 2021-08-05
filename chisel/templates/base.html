@@ -42,11 +42,11 @@
                     <a class="dropdown-item" href="{{ url_for('profile') }}">Your Profile</a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="{{ url_for('session_history') }}">Your Workout History</a>
+                    <a class="dropdown-item" href="{{ url_for('dashboard') }}">Your Workout History</a>
                   </li>
-                  <!-- <li>
+                  <li>
                     <a class="dropdown-item" href="{{ url_for('dashboard') }}">Your Settings</a>
-                  </li> -->
+                  </li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
                     <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
@@ -57,8 +57,8 @@
               <!-- unpack dropdown menu when on mobile...not the neatest code, but...-->
             <div id="unpack-menu">
                 <a class="nav-item nav-link" href="{{ url_for('profile') }}">Your Profile</a>
-                <a class="nav-item nav-link" href="{{ url_for('session_history') }}">Your Workout History</a> 
-                <!-- <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a> -->
+                <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Workout History</a> 
+                <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Your Settings</a>
                 <hr>
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Log Out</a>  
             </div>                
