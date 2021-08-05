@@ -1,0 +1,30 @@
+<!-- all customer pages will extend this file -->
+{% extends "base.html" %}
+<!-- all customer pages content will be inserted here (or where neccessary)-->
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h4><strong>Total sessions created:</strong> {{ total_count }}</h4><br/>
+        <h4><strong>Total sessions completed:</strong> {{ completed_count }}</h4>&nbsp;({{uncompleted_ses}} incomplete)<br/>
+        <br/> 
+        <h4><strong>Completed exercise count:</strong> {{ completed_ex }}</h4><br/>       
+        <h4><strong>Skipped exercise count:</strong> {{ skipped_ex }}</h4><br/>
+    </div>
+</div>
+{% endblock %}
+{% block sidebar %}
+<div class="content-section">
+  <h3 class="d-flex justify-content-center">Hey there, {{username}}!</h3>
+  <hr>
+  <div class="list-group">
+    <a href="{{ url_for( 'dashboard' ) }}" class="list-group-item list-group-item-action connect-option">
+        Back to Dashboard
+        <i class="fa fa-home" aria-hidden="true"></i>
+    </a>
+    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action connect-option">
+      Log Out
+      <i class="fa fa-sign-out"></i>
+    </a>
+  </div>
+</div>
+{% endblock %}

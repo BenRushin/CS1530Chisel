@@ -1,4 +1,4 @@
-{% extends "dashboard.html" %}
+{% extends "base.html" %}
 {% block content %}
 
     <div class="content-section">
@@ -71,6 +71,20 @@
             </div>
         </form>
     </div>
-
-
 {% endblock content %}
+{% block sidebar %}
+<div class="content-section">
+  <h3 class="d-flex justify-content-center">Hey there, {{username}}!</h3>
+  <hr>
+  <div class="list-group">
+    <!-- <a href="#" class="list-group-item list-group-item-action connect-option">
+      Account Settings
+      <i class="fa fa-sliders"></i>
+    </a> -->
+    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action connect-option">
+      Log Out
+      <i class="fa fa-sign-out"></i>
+    </a>
+  </div>
+</div>
+{% endblock %}

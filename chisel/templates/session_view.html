@@ -27,19 +27,97 @@
   </thead>
   <tbody>
     {% for ex in ex_list %}
+    {% set td_id = 'resp' + ex.id|string %}
     <tr>
       <td>{{ ex.name }}</td>
       <td>{{ ex.reps }}</td>
       <td>{{ ex.sets }}</td>
-      {% if ex.status == 3 %}
-      <td>Completed</td>
+      {% if ses.completed %}
+      <td>{% if ex.status == 1 %}Skipped{% else %}Completed{% endif %}</td>
+      {% elif ex.status == 1 %}
+      <td>Skipped</td>
+      {% elif ex.status == 3 %}
+      <td>
+          {% if not ex.customer_responded %}
+            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooEasy=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-info">Too easy?</button></form>
+            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooHard=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-secondary">Too hard?</button></form>
+            <form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id ) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-success">Just right</button></form>
+          {% else %}
+          Completed
+          {% endif %}
+      </td>
       {% else %}
-      <td><form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id ) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-success">Done</button></form>&nbsp;<a href="#" class="btn btn-sm btn-warning">Incomplete</a>&nbsp;<a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></a></td>
+      <td id="{{ td_id }}"><button id="btn{{ ex.id|string }}" class="btn btn-sm btn-success">Done</button>&nbsp;<form method="POST" action="{{ url_for( 'cancel_workout', session_id = ses.id, workout_id = ex.id ) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></button></form></td>
       {% endif %}
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+{% for ex in ex_list %}
+{% set td_id = 'resp' + ex.id|string %}
+<script>
+  document.getElementById( "btn{{ ex.id|string }}" ).addEventListener( "click", () => {
+    const td = document.getElementById( "{{ td_id }}" );
+    while ( td.firstChild ) {
+      td.removeChild( td.firstChild );
+    }
+
+    const f1 = document.createElement( "form" );
+    f1.setAttribute( "method", "POST" );
+    f1.setAttribute( "action", "{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooEasy=True) }}" );
+    f1.style.display = "inline";
+
+    const ez = document.createElement( "button" );
+    ez.setAttribute( "type", "submit" );
+    ez.classList.add( "btn" );
+    ez.classList.add( "btn-sm" );
+    ez.classList.add( "btn-info" );
+    ez.appendChild( document.createTextNode( "Too easy?" ) ); 
+
+    f1.appendChild( ez );
+    td.appendChild( f1 );
+
+    td.appendChild( document.createTextNode( " " ) );
+
+    const f2 = document.createElement( "form" );
+    f2.setAttribute( "method", "POST" );
+    f2.setAttribute( "action", "{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooHard=True) }}" );
+    f2.style.display = "inline";
+
+    
+    const hrd = document.createElement( "button" );
+    hrd.setAttribute( "type", "submit" );
+    hrd.classList.add( "btn" );
+    hrd.classList.add( "btn-sm" );
+    hrd.classList.add( "btn-secondary" );
+    hrd.appendChild( document.createTextNode( "Too hard?" ) );
+    
+    f2.appendChild( hrd );
+    td.appendChild( f2 );
+
+    td.appendChild( document.createTextNode( " " ) );
+
+    const f3 = document.createElement( "form" );
+    f3.setAttribute( "method", "POST" );
+    f3.setAttribute( "action", "{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id ) }}" );
+    f3.style.display = "inline";
+    
+    const jr = document.createElement( "button" );
+    jr.setAttribute( "type", "submit" );
+    jr.classList.add( "btn" );
+    jr.classList.add( "btn-sm" );
+    jr.classList.add( "btn-success" );
+    jr.appendChild( document.createTextNode( "Just right" ) );
+
+    f3.appendChild( jr );
+    td.appendChild( f3 );
+
+    //<form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooEasy=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-info">Too easy?</button></form>
+    //<form method="POST" action="{{ url_for( 'complete_workout', session_id = ses.id, workout_id = ex.id, tooHard=True) }}" style="display: inline"><button type="submit" class="btn btn-sm btn-secondary">Too hard?</button></form>
+  } );
+</script>
+{% endfor %}
 {% endblock %}
 {% block sidebar %}
 <div class="content-section">

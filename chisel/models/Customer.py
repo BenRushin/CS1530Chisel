@@ -18,6 +18,7 @@ class Customer(db.Model, UserMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     sessions = db.relationship( 'WorkoutSession', backref='customer' )
     dark_mode = db.Column(db.Boolean(), nullable=True)
+    modifiers = db.relationship( 'ExerciseModifier', backref='customer' )
 
     followed = db.relationship(
         'Customer', secondary=followers,
