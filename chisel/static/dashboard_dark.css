@@ -17,10 +17,6 @@ h1, h2, h3, h4, h5, h6 {
 .form-control{
 	background-color: #c1c1c1;
 }
-.list-group-item.disabled{
-	color: #bbbbbb;
-	background-color: #3a3a3a;
-}
 .connect-option {
   display: flex;
   justify-content: space-between;
