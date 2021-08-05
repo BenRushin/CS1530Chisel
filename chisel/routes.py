@@ -239,7 +239,7 @@ def statistics():
         exercises_skipped += skipped_count
 
     return render_template('stats.html', username=current_user.username, total_count = total_ses_count, 
-    completed_count = completed_ses_count, uncompleted_ses = uncompleted_ses_count, completed_ex = exercises_completed, skipped_ex = skipped_count )
+    completed_count = completed_ses_count, uncompleted_ses = uncompleted_ses_count, completed_ex = exercises_completed, skipped_ex = exercises_skipped )
 
 @app.route( '/session-list/delete/' )
 @app.route( '/session-list/delete/<session_id>' )
