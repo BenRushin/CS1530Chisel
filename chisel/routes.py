@@ -134,7 +134,6 @@ def complete_workout( session_id = None, workout_id = None, tooHard = False, too
             cur_sets += 1
         flash("Exercise was made harder!", 'success')
 
-        exercise_to_update.customer_responded = True
     
     if tooHard:
         if int(cur_reps) > 8:
@@ -143,7 +142,7 @@ def complete_workout( session_id = None, workout_id = None, tooHard = False, too
             cur_sets -= 1
         flash("Exercise was made easier!", 'success')
 
-        exercise_to_update.customer_responded = True
+    exercise_to_update.customer_responded = True
 
     db.session.add( ExerciseModifier( exercise_id = exercise_to_update.unique_id_in_dict, rep_modifier = cur_reps, set_modifier = cur_sets, user_id = current_customer.id ) )
     db.session.commit()
