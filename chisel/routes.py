@@ -34,7 +34,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        customer = Customer(username=form.username.data, email=form.email.data, password=hashed_pw, bio="",dark_mode=False)
+        customer = Customer( username=form.username.data, email=form.email.data, password=hashed_pw, bio="", dark_mode = False )
         db.session.add(customer)
         db.session.commit()
         flash(f'Welcome to Chisel, {form.username.data}!', 'success')

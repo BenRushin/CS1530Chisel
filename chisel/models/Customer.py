@@ -14,10 +14,10 @@ class Customer(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     bio = db.Column(db.String(300), nullable=False)
+    dark_mode = db.Column( db.Boolean, nullable=True, default=False )
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='author', lazy=True)
     sessions = db.relationship( 'WorkoutSession', backref='customer' )
-    dark_mode = db.Column(db.Boolean(), nullable=True)
     modifiers = db.relationship( 'ExerciseModifier', backref='customer' )
 
     followed = db.relationship(
